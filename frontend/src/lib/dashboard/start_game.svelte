@@ -1,19 +1,14 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
-	// import { alertModal } from '$lib/stores';
 	import { captcha_enabled } from '$lib/config';
-	import StartGameBackground from './start_game_background.svg';
 	import { fade } from 'svelte/transition';
 	import Spinner from '$lib/Spinner.svelte';
 	import { onMount } from 'svelte';
 	import { createTippy } from 'svelte-tippy';
 	import { getLocalization } from '$lib/i18n';
-
 	const { t } = getLocalization();
 	let { quiz_id = $bindable() } = $props();
 	let captcha_selected = $state(false);
@@ -22,198 +17,139 @@ SPDX-License-Identifier: MPL-2.0
 	let custom_field = $state('');
 	let cqcs_enabled = $state(false);
 	let randomized_answers = $state(false);
-
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'top-start',
-		allowHTML: true
-	});
+	const tippy = createTippy({ arrow: true, animation: 'perspective-subtle', placement: 'top-start', allowHTML: true });
 
 	onMount(() => {
 		const ls_data = localStorage.getItem('custom_field');
 		custom_field = ls_data ? ls_data : '';
+		document.body.addEventListener('keydown', (key) => {
+			if (key.code === 'Escape') quiz_id = null;
+		});
 	});
 
 	const start_game = async (id: string) => {
-		let res;
 		loading = true;
 		localStorage.setItem('custom_field', custom_field);
-		const cqcs_enabled_parsed = cqcs_enabled ? 'True' : 'False';
-		const randomized_answers_parsed = randomized_answers ? 'True' : 'False';
-		if (captcha_enabled && captcha_selected) {
-			res = await fetch(
-				`/api/v1/quiz/start/${id}?captcha_enabled=True&game_mode=${selected_game_mode}&custom_field=${custom_field}&cqcs_enabled=${cqcs_enabled_parsed}`,
-				{
-					method: 'POST'
-				}
-			);
-		} else {
-			res = await fetch(
-				`/api/v1/quiz/start/${id}?captcha_enabled=False&game_mode=${selected_game_mode}&custom_field=${custom_field}&cqcs_enabled=${cqcs_enabled_parsed}&randomize_answers=${randomized_answers_parsed}`,
-				{
-					method: 'POST'
-				}
-			);
-		}
+		const cqcs_parsed = cqcs_enabled ? 'True' : 'False';
+		const rand_parsed = randomized_answers ? 'True' : 'False';
+		const captcha_param = captcha_enabled && captcha_selected ? 'True' : 'False';
+		const res = await fetch(
+			`/api/v1/quiz/start/${id}?captcha_enabled=${captcha_param}&game_mode=${selected_game_mode}&custom_field=${custom_field}&cqcs_enabled=${cqcs_parsed}&randomize_answers=${rand_parsed}`,
+			{ method: 'POST' }
+		);
 		if (res.status !== 200) {
-			/*			alertModal.set({
-				open: true,
-				title: 'Start failed',
-				body: `Failed to start game, ${await res.text()}`
-			});*/
-			/*alertModal.subscribe((_) => {
-				window.location.assign('/account/login?returnTo=/dashboard');
-			});*/
-			alert('Starting game failed');
+			alert('Spiel konnte nicht gestartet werden.');
 			window.location.assign('/account/login?returnTo=/dashboard');
 		} else {
 			const data = await res.json();
-			// eslint-disable-next-line no-undef
-			plausible('Started Game', { props: { quiz_id: id, game_id: data.game_id } });
-			window.location.assign(
-				`/admin?token=${data.game_id}&pin=${data.game_pin}&connect=1&cqc_code=${data.cqc_code}`
-			);
+			window.location.assign(`/admin?token=${data.game_id}&pin=${data.game_pin}&connect=1&cqc_code=${data.cqc_code}`);
 		}
 	};
 
 	const on_parent_click = (e: Event) => {
-		if (e.target !== e.currentTarget) {
-			return;
-		}
-		quiz_id = null;
+		if (e.target === e.currentTarget) quiz_id = null;
 	};
-	const close_start_game_if_esc_is_pressed = (key: KeyboardEvent) => {
-		if (key.code === 'Escape') {
-			quiz_id = null;
-		}
-	};
-	onMount(() => {
-		document.body.addEventListener('keydown', close_start_game_if_esc_is_pressed);
-	});
 </script>
 
 <div
-	class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
-	transition:fade|global={{ duration: 100 }}
+	class="fixed top-0 left-0 flex items-center justify-center w-screen h-screen z-50"
+	style="background-color: rgba(0,0,0,0.7);"
+	transition:fade|global={{ duration: 150 }}
 	onclick={on_parent_click}
 >
-	<div
-		class="w-5/6 h-5/6 bg-black m-auto rounded-lg shadow-lg p-4 flex flex-col"
-		style="background-image: url({StartGameBackground}); background-color: #DFDBE5;"
-	>
-		<div class="flex justify-center w-full">
-			<label
-				for="large-toggle"
-				class="inline-flex relative items-center cursor-pointer"
-				class:pointer-events-none={!captcha_enabled}
-				class:opacity-50={!captcha_enabled}
-			>
-				<input
-					type="checkbox"
-					bind:checked={captcha_selected}
-					id="large-toggle"
-					class="sr-only peer"
-				/>
-				<span
-					class="w-14 h-7 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-				></span>
-				<span class="ml-3 text-sm font-medium text-gray-900"
-					>Captcha {captcha_selected ? 'enabled' : 'disabled'}</span
-				>
-			</label>
-		</div>
-		{#if captcha_selected}
-			<div class="flex justify-center mt-2" in:fade|global>
-				<p class="w-1/3">
-					{$t('start_game.captcha_message')}
-				</p>
-				<!-- Todo: Add translation  -->
-			</div>
-		{/if}
+	<div class="rounded-2xl shadow-2xl p-6 w-full max-w-xl flex flex-col gap-5" style="background-color:#1E293B; color:#F8FAFC;">
 
-		<div class="grid grid-cols-2 gap-8 my-auto">
-			<div
-				class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
-				class:opacity-50={selected_game_mode !== 'kahoot'}
-				onclick={() => {
-					selected_game_mode = 'kahoot';
-				}}
-			>
-				<h2 class="text-center text-2xl">{$t('words.normal')}</h2>
-				<p>
-					{$t('start_game.normal_mode_description')}
-				</p>
-			</div>
-			<div
-				class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
-				class:opacity-50={selected_game_mode !== 'normal'}
-				onclick={() => {
-					selected_game_mode = 'normal';
-				}}
-			>
-				<h2 class="text-center text-2xl">{$t('start_game.old_school_mode')}</h2>
-				<p>
-					{$t('start_game.old_school_mode_description')}
-				</p>
+		<!-- Header -->
+		<div class="flex items-center justify-between">
+			<h2 class="text-xl font-bold" style="color:#6366F1;">{$t('start_game.start_game')}</h2>
+			<button onclick={() => { quiz_id = null; }} class="rounded-lg p-1.5 transition hover:bg-white/10" style="color:#CBD5E1;">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+			</button>
+		</div>
+
+		<!-- Spielmodus -->
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color:#CBD5E1;">Spielmodus</p>
+			<div class="grid grid-cols-2 gap-3">
+				<button
+					type="button"
+					onclick={() => { selected_game_mode = 'kahoot'; }}
+					class="rounded-xl p-4 text-left transition border"
+					style="background-color:{selected_game_mode === 'kahoot' ? '#6366F1' : '#0F172A'}; border-color:{selected_game_mode === 'kahoot' ? '#6366F1' : '#6366F133'}; color:#F8FAFC;"
+				>
+					<p class="font-semibold mb-1">{$t('words.normal')}</p>
+					<p class="text-xs" style="color:{selected_game_mode === 'kahoot' ? '#E0E7FF' : '#CBD5E1'};">{$t('start_game.normal_mode_description')}</p>
+				</button>
+				<button
+					type="button"
+					onclick={() => { selected_game_mode = 'normal'; }}
+					class="rounded-xl p-4 text-left transition border"
+					style="background-color:{selected_game_mode === 'normal' ? '#6366F1' : '#0F172A'}; border-color:{selected_game_mode === 'normal' ? '#6366F1' : '#6366F133'}; color:#F8FAFC;"
+				>
+					<p class="font-semibold mb-1">{$t('start_game.old_school_mode')}</p>
+					<p class="text-xs" style="color:{selected_game_mode === 'normal' ? '#E0E7FF' : '#CBD5E1'};">{$t('start_game.old_school_mode_description')}</p>
+				</button>
 			</div>
 		</div>
-		<div class="flex justify-center items-center my-auto">
-			<label class="mr-4">{$t('result_page.custom_field')}</label>
+
+		<!-- Benutzerdefiniertes Feld -->
+		<div>
+			<label class="text-xs font-semibold uppercase tracking-widest block mb-2" style="color:#CBD5E1;">
+				{$t('result_page.custom_field')}
+			</label>
 			<input
 				bind:value={custom_field}
-				class="rounded-lg p-2 outline-hidden placeholder:italic"
-				placeholder="Phone Number or Email"
+				class="w-full rounded-lg p-2.5 outline-none text-sm"
+				style="background-color:#0F172A; color:#F8FAFC; border:1px solid #6366F133;"
+				placeholder="Telefonnummer oder E-Mail"
 			/>
 		</div>
-		<div class="flex justify-center w-full my-auto">
-			<label for="cqc-toggle" class="inline-flex relative items-center cursor-pointer">
-				<input
-					type="checkbox"
-					bind:checked={cqcs_enabled}
-					id="cqc-toggle"
-					class="sr-only peer"
-				/>
-				<span
-					class="w-14 h-7 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-				></span>
-				<span class="ml-3 text-sm font-medium text-gray-900"
-					><a
-						href="/controller"
-						target="_blank"
-						use:tippy={{
-							content:
-								'ClassQuizControllers are small physical devices to play ClassQuiz. Click to learn more.'
-						}}
-						class="decoration-dashed underline cursor-help">ClassQuizControllers</a
-					>
-					are {cqcs_enabled ? 'enabled' : 'disabled'}</span
-				>
+
+		<!-- Optionen -->
+		<div class="flex flex-col gap-3">
+			<p class="text-xs font-semibold uppercase tracking-widest" style="color:#CBD5E1;">Optionen</p>
+
+			<!-- Antworten zufällig -->
+			<label class="flex items-center gap-3 cursor-pointer">
+				<div class="relative w-11 h-6 rounded-full transition" style="background-color:{randomized_answers ? '#6366F1' : '#0F172A'}; border:1px solid #6366F133;">
+					<input type="checkbox" bind:checked={randomized_answers} class="sr-only"/>
+					<div class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style="left:{randomized_answers ? '1.25rem' : '0.125rem'};"></div>
+				</div>
+				<span class="text-sm" style="color:#CBD5E1;">Antworten zufällig anordnen</span>
 			</label>
-		</div>
-		<div class="flex justify-center w-full my-auto">
-			<label
-				for="randomized-answers-toggle"
-				class="inline-flex relative items-center cursor-pointer"
-			>
-				<input
-					type="checkbox"
-					bind:checked={randomized_answers}
-					id="randomized-answers-toggle"
-					class="sr-only peer"
-				/>
-				<span
-					class="w-14 h-7 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-				></span>
-				<span class="ml-3 text-sm font-medium text-gray-900"> Randomize answers</span>
+
+			<!-- ClassQuizControllers -->
+			<label class="flex items-center gap-3 cursor-pointer">
+				<div class="relative w-11 h-6 rounded-full transition" style="background-color:{cqcs_enabled ? '#6366F1' : '#0F172A'}; border:1px solid #6366F133;">
+					<input type="checkbox" bind:checked={cqcs_enabled} class="sr-only"/>
+					<div class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style="left:{cqcs_enabled ? '1.25rem' : '0.125rem'};"></div>
+				</div>
+				<span class="text-sm" style="color:#CBD5E1;">
+					<a href="/controller" target="_blank" use:tippy={{ content: 'Kleine Hardware-Geräte zum Spielen von ClassQuiz.' }} class="underline decoration-dashed cursor-help" style="color:#6366F1;">ClassQuiz-Controller</a>
+					{cqcs_enabled ? 'aktiviert' : 'deaktiviert'}
+				</span>
 			</label>
+
+			<!-- Captcha -->
+			{#if captcha_enabled}
+				<label class="flex items-center gap-3 cursor-pointer">
+					<div class="relative w-11 h-6 rounded-full transition" style="background-color:{captcha_selected ? '#6366F1' : '#0F172A'}; border:1px solid #6366F133;">
+						<input type="checkbox" bind:checked={captcha_selected} class="sr-only"/>
+						<div class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style="left:{captcha_selected ? '1.25rem' : '0.125rem'};"></div>
+					</div>
+					<span class="text-sm" style="color:#CBD5E1;">Captcha {captcha_selected ? 'aktiviert' : 'deaktiviert'}</span>
+				</label>
+				{#if captcha_selected}
+					<p class="text-xs rounded-lg p-3" style="background-color:#0F172A; color:#CBD5E1;" in:fade|global>{$t('start_game.captcha_message')}</p>
+				{/if}
+			{/if}
 		</div>
 
+		<!-- Starten-Button -->
 		<button
-			class="mt-auto mx-auto bg-green-500 p-4 rounded-lg shadow-lg hover:bg-green-400 transition-all marck-script text-2xl"
-			onclick={() => {
-				start_game(quiz_id);
-			}}
+			onclick={() => { start_game(quiz_id); }}
+			class="w-full py-3 rounded-xl font-bold text-lg transition mt-2"
+			style="background-color:#22C55E; color:#F8FAFC;"
 		>
 			{#if loading}
 				<Spinner my_20={false} />

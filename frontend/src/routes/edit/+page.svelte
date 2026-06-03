@@ -10,7 +10,7 @@ SPDX-License-Identifier: MPL-2.0
 	import { navbarVisible} from '$lib/stores.svelte.ts';
 	import { QuizQuestionType } from '$lib/quiz_types';
 
-	navbarVisible.visible= false;
+	navbarVisible.visible= true;
 
 	const { t } = getLocalization();
 

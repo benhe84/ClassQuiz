@@ -1,45 +1,184 @@
 /*
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 */
-
 @import 'tippy.js/animations/perspective-subtle.css';
 @import 'tippy.js/dist/tippy.css';
-/* Write your global styles here, in PostCSS syntax */
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 @tailwind utilities;
 
+/* ── DESIGN TOKENS ── */
+:root {
+	/* Light Mode */
+	--bg:              #F8FAFC;
+	--surface:         #FFFFFF;
+	--primary:         #4F46E5;
+	--primary-hover:   #6366F1;
+	--secondary:       #0F766E;
+	--text:            #0F172A;
+	--text-primary:    #0F172A;
+	--text-secondary:  #475569;
+	--border:          #E2E8F0;
+	--success:         #16A34A;
+	--warning:         #D97706;
+	--danger:          #DC2626;
+	--shadow:          rgba(15, 23, 42, 0.08);
+	--answer-a:        #3B82F6;
+	--answer-b:        #10B981;
+	--answer-c:        #F59E0B;
+	--answer-d:        #8B5CF6;
+}
+
+.dark {
+	/* Dark Mode */
+	--bg:              #0F172A;
+	--surface:         #1E293B;
+	--primary:         #6366F1;
+	--primary-hover:   #818CF8;
+	--secondary:       #14B8A6;
+	--success:         #22C55E;
+	--warning:         #F59E0B;
+	--danger:          #EF4444;
+	--text-primary:    #F8FAFC;
+	--text-secondary:  #CBD5E1;
+	--border:          #334155;
+	--shadow:          rgba(0, 0, 0, 0.30);
+}
+
+/* Answer Colors (theme-independent) */
+:root {
+	--answer-a:          #3B82F6;
+	--answer-b:          #10B981;
+	--answer-c:          #F59E0B;
+	--answer-d:          #8B5CF6;
+	--answer-a-hover:    #60A5FA;
+	--answer-b-hover:    #34D399;
+	--answer-c-hover:    #FBBF24;
+	--answer-d-hover:    #A78BFA;
+	--answer-a-active:   #1D4ED8;
+	--answer-b-active:   #059669;
+	--answer-c-active:   #D97706;
+	--answer-d-active:   #7C3AED;
+	--correct:           #22C55E;
+	--incorrect:         #EF4444;
+	--partial:           #F59E0B;
+	--unanswered:        #64748B;
+	--chart-1:           #6366F1;
+	--chart-2:           #14B8A6;
+	--chart-3:           #3B82F6;
+	--chart-4:           #8B5CF6;
+	--chart-5:           #F59E0B;
+	--chart-6:           #22C55E;
+}
+
+/* ── BASE ── */
+html, body {
+	background-color: var(--bg);
+	color: var(--text-primary);
+	min-height: 100vh;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ── TYPOGRAPHY ── */
 .marck-script {
 	font-family: 'Marck Script';
 }
 
-.link-hover {
-	transition: all 0.3s;
+/* ── GLOBAL COMPONENTS ── */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	transition: all 0.15s;
+	cursor: pointer;
+	border: none;
 }
 
-.link-hover:hover {
-	color: #4e6e58;
+.btn-primary {
+	background-color: var(--primary);
+	color: #F8FAFC;
 }
+.btn-primary:hover { background-color: var(--primary-hover); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-danger {
+	background-color: color-mix(in srgb, var(--danger) 20%, transparent);
+	color: var(--danger);
+}
+.btn-danger:hover { background-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+
+.card {
+	background-color: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 1rem;
+	padding: 1.5rem;
+	box-shadow: 0 2px 8px var(--shadow);
+}
+
+.input {
+	background-color: var(--bg);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+	border-radius: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	outline: none;
+	transition: border-color 0.15s;
+	width: 100%;
+}
+.input:focus { border-color: var(--primary); }
+
+.label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--text-secondary);
+	display: block;
+	margin-bottom: 0.5rem;
+}
+
+/* ── ANSWER BUTTONS ── */
+.answer-btn {
+	border-radius: 0.75rem;
+	padding: 1rem;
+	font-weight: 700;
+	font-size: 1rem;
+	color: white;
+	transition: all 0.15s;
+	cursor: pointer;
+	border: none;
+	width: 100%;
+}
+.answer-a { background-color: var(--answer-a); }
+.answer-a:hover { background-color: var(--answer-a-hover); }
+.answer-a.selected { background-color: var(--answer-a-active); }
+
+.answer-b { background-color: var(--answer-b); }
+.answer-b:hover { background-color: var(--answer-b-hover); }
+.answer-b.selected { background-color: var(--answer-b-active); }
+
+.answer-c { background-color: var(--answer-c); }
+.answer-c:hover { background-color: var(--answer-c-hover); }
+.answer-c.selected { background-color: var(--answer-c-active); }
+
+.answer-d { background-color: var(--answer-d); }
+.answer-d:hover { background-color: var(--answer-d-hover); }
+.answer-d.selected { background-color: var(--answer-d-active); }
+
 @layer base {
 	button:not(:disabled),
 	[role='button']:not(:disabled) {
 		cursor: pointer;
 	}
-}
-
-@utility normal-background {
-	@apply bg-gradient-to-r from-[#009444] via-[#39b54a] to-[#8dc63f] dark:bg-[#0f2702] dark:from-[#0f2702] dark:via-[#0f2702] dark:to-[#0f2702];
-}
-
-@utility admin-button {
-	@apply px-4 py-2 leading-5 text-white transition-colors duration-200 transform bg-gray-700 rounded-sm text-center hover:bg-gray-600 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50;
-}
-
-@utility action-button {
-	@apply px-4 py-2 leading-5 text-black dark:text-white transition-colors duration-200 transform bg-gray-50 dark:bg-gray-700 rounded-sm text-center hover:bg-gray-300 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-600;
-}
-@utility btn-nav {
-	@apply text-lg font-medium px-3 text-gray-600 hover:text-green-600 py-1.5 transition-all duration-300;
 }

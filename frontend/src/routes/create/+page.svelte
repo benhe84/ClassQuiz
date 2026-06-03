@@ -12,7 +12,7 @@ SPDX-License-Identifier: MPL-2.0
 	import type { Question } from '$lib/quiz_types';
 	import { page } from '$app/state';
 
-	navbarVisible.visible = false;
+	navbarVisible.visible = true;
 
 	const { t } = getLocalization();
 
