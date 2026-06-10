@@ -6,7 +6,6 @@ SPDX-License-Identifier: MPL-2.0
 import DownloadQuiz from '$lib/components/DownloadQuiz.svelte';
 import type { QuizData } from '$lib/quiz_types';
 import { getLocalization } from '$lib/i18n';
-import Footer from '$lib/footer.svelte';
 import { signedIn } from '$lib/stores';
 import { navbarVisible } from '$lib/stores.svelte';
 import CommandpaletteNotice from '$lib/components/popover/commandpalettenotice.svelte';
@@ -166,7 +165,6 @@ Starten
 </div>
 {/if}
 </main>
-<Footer />
 </div>
 
 {#if download_id}

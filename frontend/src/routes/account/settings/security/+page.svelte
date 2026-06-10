@@ -1,54 +1,48 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import Spinner from '$lib/Spinner.svelte';
 	import { browser } from '$app/environment';
 	import { startRegistration } from '@simplewebauthn/browser';
 	import TotpSetup from './totp_setup.svelte';
 	import BackupCodes from './backup_codes.svelte';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { getLocalization } from '$lib/i18n';
-
 	const { t } = getLocalization();
 
-	let user_data: object | undefined = $state();
-	let security_keys: Array<{ id: number }> | undefined = $state();
-	let totp_activated: boolean | undefined = $state();
+	let user_data = $state();
+	let security_keys = $state([]);
+	let totp_activated = $state(false);
 	let totp_data = $state();
 	let backup_code = $state();
+	let loading = $state(true);
 
 	const get_data = async () => {
-		const res1 = await fetch('/api/v1/users/me');
-		user_data = await res1.json();
-		const res2 = await fetch('/api/v1/users/webauthn/list');
-		security_keys = await res2.json();
-		const res3 = await fetch('/api/v1/users/2fa/totp');
-		totp_activated = (await res3.json()).activated;
+		const [r1, r2, r3] = await Promise.all([
+			fetch('/api/v1/users/me'),
+			fetch('/api/v1/users/webauthn/list'),
+			fetch('/api/v1/users/2fa/totp')
+		]);
+		user_data = await r1.json();
+		security_keys = await r2.json();
+		totp_activated = (await r3.json()).activated;
+		loading = false;
 	};
-	let data = $state(get_data());
+
+	get_data();
+
+	const require_password = () => prompt('Bitte Passwort eingeben');
 
 	const save_password_required = async () => {
-		console.log(user_data?.require_password, 'here');
-		if (!browser || user_data?.require_password === undefined) {
-			return;
-		}
+		if (!browser || user_data?.require_password === undefined) return;
 		const pw = require_password();
 		const res = await fetch('/api/v1/users/2fa/require_password', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ require_password: user_data?.require_password, password: pw })
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ require_password: user_data.require_password, password: pw })
 		});
 		user_data.require_password = (await res.json()).require_password;
-	};
-
-	const require_password = (): string | null => {
-		return prompt('Please enter your password to continue');
 	};
 
 	const add_security_key = async () => {
@@ -59,33 +53,19 @@ SPDX-License-Identifier: MPL-2.0
 			body: JSON.stringify({ password: pw }),
 			headers: { 'Content-Type': 'application/json' }
 		});
-		if (res1.status === 401) {
-			alert('Password probably wrong');
-			return;
-		}
-		if (!res1.ok) {
-			throw Error('Response not ok');
-		}
-		let attResp;
+		if (res1.status === 401) { alert('Passwort wahrscheinlich falsch'); return; }
+		if (!res1.ok) throw Error('Response not ok');
 		const resp_data = await res1.json();
-		// eslint-disable-next-line no-useless-catch
 		try {
 			resp_data.authenticatorSelection.authenticatorAttachment = 'cross-platform';
-			for (let i = 0; i++; i < resp_data.excludeCredentials.length) {
-				resp_data.excludeCredentials[i].transports = undefined;
-			}
-			attResp = await startRegistration({ optionsJSON: resp_data });
-		} catch (e) {
-			throw e;
-		}
-		await fetch('/api/v1/users/webauthn/add_key', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(attResp)
-		});
-		data = get_data();
+			const attResp = await startRegistration({ optionsJSON: resp_data });
+			await fetch('/api/v1/users/webauthn/add_key', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(attResp)
+			});
+		} catch (e) { throw e; }
+		await get_data();
 	};
 
 	const remove_security_key = async (key_id: number) => {
@@ -96,26 +76,20 @@ SPDX-License-Identifier: MPL-2.0
 			body: JSON.stringify({ password: pw }),
 			headers: { 'Content-Type': 'application/json' }
 		});
-		if (res.status === 401) {
-			alert('Password probably wrong');
-			return;
-		}
-		data = get_data();
+		if (res.status === 401) { alert('Passwort wahrscheinlich falsch'); return; }
+		await get_data();
 	};
 
 	const disable_totp = async () => {
 		const pw = require_password();
 		if (!pw) return;
-		const res = await fetch(`/api/v1/users/2fa/totp`, {
+		const res = await fetch('/api/v1/users/2fa/totp', {
 			method: 'DELETE',
 			body: JSON.stringify({ password: pw }),
 			headers: { 'Content-Type': 'application/json' }
 		});
-		if (res.status === 401) {
-			alert('Password probably wrong');
-			return;
-		}
-		data = get_data();
+		if (res.status === 401) { alert('Passwort wahrscheinlich falsch'); return; }
+		await get_data();
 	};
 
 	const enable_totp = async () => {
@@ -126,165 +100,110 @@ SPDX-License-Identifier: MPL-2.0
 			body: JSON.stringify({ password: pw }),
 			headers: { 'Content-Type': 'application/json' }
 		});
-		if (res.status === 401) {
-			alert('Password probably wrong');
-			return;
-		}
-		data = get_data();
+		if (res.status === 401) { alert('Passwort wahrscheinlich falsch'); return; }
 		totp_data = await res.json();
+		await get_data();
 	};
 
 	const get_backup_code = async () => {
 		const pw = require_password();
 		if (!pw) return;
-		if (!confirm('If you continue, your old backup-code will be removed.')) {
-			return;
-		}
+		if (!confirm('Der alte Backup-Code wird dabei gelöscht. Fortfahren?')) return;
 		const res = await fetch('/api/v1/users/2fa/backup_code', {
 			method: 'POST',
 			body: JSON.stringify({ password: pw }),
 			headers: { 'Content-Type': 'application/json' }
 		});
-		if (res.status === 401) {
-			alert('Password probably wrong');
-			return;
-		}
+		if (res.status === 401) { alert('Passwort wahrscheinlich falsch'); return; }
 		backup_code = (await res.json()).code;
 	};
 </script>
 
-{#await data}
-	<Spinner my_20={false} />
-{:then _}
-	<div class="grid grid-rows-2 h-screen">
-		<div class="grid grid-cols-2 h-full border-b-2 border-black">
-			<div class="h-full w-full border-r-2 border-black">
-				<h2 class="text-center text-2xl">{$t('security_settings.backup_code')}</h2>
-				<div class="flex h-full w-full justify-center">
-					<div class="m-auto">
-						<BrownButton onclick={get_backup_code}
-							>{$t('security_settings.get_backup_code')}</BrownButton
-						>
-					</div>
-				</div>
-			</div>
-			<div class="h-full w-full">
-				<h2 class="text-center text-2xl">{$t('security_settings.activate_2fa')}</h2>
-				<div
-					class="flex h-full w-full justify-center flex-col"
-					class:pointer-events-none={!totp_activated}
-					class:grayscale={!totp_activated}
-					class:opacity-50={!totp_activated}
+<svelte:head>
+	<title>ClassQuiz - Sicherheitseinstellungen</title>
+</svelte:head>
+
+{#if loading}
+	<div class="flex justify-center py-20"><Spinner /></div>
+{:else}
+	<div class="max-w-4xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
+
+		<!-- 2FA / Passwort erforderlich -->
+		<div class="card">
+			<h2 class="label mb-4">{$t('security_settings.activate_2fa')}</h2>
+			<div class="flex items-center gap-4" class:opacity-50={!totp_activated} class:pointer-events-none={!totp_activated}>
+				<button
+					type="button"
+					role="switch"
+					aria-checked={user_data?.require_password}
+					onclick={() => { user_data.require_password = !user_data.require_password; save_password_required(); }}
+					class="relative w-11 h-6 rounded-full transition"
+					style="background-color:{user_data?.require_password ? 'var(--primary)' : 'var(--border)'};"
 				>
-					<div class="m-auto">
-						{#if user_data.require_password}
-							<div class="flex items-center space-x-2">
-								<button
-									disabled={!totp_activated}
-									onclick={() => {
-										user_data.require_password = !user_data.require_password;
-										save_password_required();
-									}}
-									type="button"
-									role="switch"
-									aria-checked="true"
-									class="relative inline-flex h-5 w-8 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-transparent bg-blue-700 transition focus:outline-hidden focus:ring focus:ring-blue-200"
-								>
-									<span
-										aria-hidden="true"
-										class="pointer-events-none inline-block h-4 w-4 translate-x-3 rounded-full bg-white transition will-change-transform"
-									></span>
-								</button>
-								<span class="text-sm font-medium text-gray-700 dark:text-white"
-									>{$t('security_settings.2fa_activated')}</span
-								>
-							</div>
-						{:else}
-							<div class="flex items-center space-x-2">
-								<button
-									disabled={!totp_activated}
-									type="button"
-									onclick={() => {
-										user_data.require_password = !user_data.require_password;
-										save_password_required();
-									}}
-									role="switch"
-									aria-checked="false"
-									class="relative inline-flex h-5 w-8 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-transparent bg-gray-200 transition focus:outline-hidden focus:ring focus:ring-blue-200"
-								>
-									<span
-										aria-hidden="true"
-										class="pointer-events-none inline-block h-4 w-4 translate-x-0 rounded-full bg-white transition will-change-transform"
-									></span>
-								</button>
-								<span class="text-sm font-medium text-gray-700 dark:text-white"
-									>{$t('security_settings.2fa_deactivated')}</span
-								>
-							</div>
-						{/if}
-					</div>
-				</div>
+					<span class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"
+						style="left:{user_data?.require_password ? '1.25rem' : '0.125rem'};"></span>
+				</button>
+				<span class="text-sm" style="color:var(--text-secondary);">
+					{user_data?.require_password ? $t('security_settings.2fa_activated') : $t('security_settings.2fa_deactivated')}
+				</span>
 			</div>
 		</div>
-		<div class="grid grid-cols-2 h-full">
-			<div class="h-full w-full flex flex-col border-r-2 border-black">
-				<h2 class="text-center text-2xl">{$t('security_settings.webauthn')}</h2>
-				<div class="flex justify-center">
-					{#if security_keys.length > 0}
-						<p>{$t('security_settings.webauthn_available')}</p>
-					{:else}
-						<p>{$t('security_settings.webauthn_unavailable')}</p>
-					{/if}
-				</div>
-				<div class="flex justify-center">
-					<div class="m-auto">
-						<BrownButton onclick={add_security_key}
-							>{$t('security_settings.add_security_key')}</BrownButton
-						>
-					</div>
-				</div>
-				<div class="flex justify-center">
-					<ul class="list-disc block">
-						{#each security_keys as key, i}
-							<li>
-								<button
-									onclick={() => {
-										remove_security_key(key.id);
-									}}
-									class="hover:line-through transition">{i + 1}</button
-								>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</div>
-			<div class="h-full w-full flex flex-col">
-				<h2 class="text-center text-2xl">{$t('security_settings.totp')}</h2>
-				<div class="flex justify-center">
-					{#if totp_activated}
-						<p>{$t('security_settings.totp_available')}</p>
-					{:else}
-						<p>{$t('security_settings.totp_unavailable')}</p>
-					{/if}
-				</div>
 
-				<div class="flex justify-center">
-					<div class="m-auto">
-						{#if totp_activated}
-							<BrownButton onclick={disable_totp}
-								>{$t('security_settings.disable_totp')}</BrownButton
-							>
-						{:else}
-							<BrownButton onclick={enable_totp}
-								>{$t('security_settings.enable_totp')}</BrownButton
-							>
-						{/if}
-					</div>
+		<!-- TOTP -->
+		<div class="card">
+			<h2 class="label mb-4">{$t('security_settings.totp')}</h2>
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-2">
+					<div class="w-2 h-2 rounded-full" style="background-color:{totp_activated ? 'var(--success)' : 'var(--text-secondary)'}"></div>
+					<span class="text-sm" style="color:var(--text-secondary);">
+						{totp_activated ? $t('security_settings.totp_available') : $t('security_settings.totp_unavailable')}
+					</span>
 				</div>
+				{#if totp_activated}
+					<button onclick={disable_totp} class="btn btn-danger text-sm">{$t('security_settings.disable_totp')}</button>
+				{:else}
+					<button onclick={enable_totp} class="btn btn-primary text-sm">{$t('security_settings.enable_totp')}</button>
+				{/if}
 			</div>
+		</div>
+
+		<!-- Backup-Code -->
+		<div class="card">
+			<h2 class="label mb-4">{$t('security_settings.backup_code')}</h2>
+			<button onclick={get_backup_code} class="btn btn-primary text-sm">
+				{$t('security_settings.get_backup_code')}
+			</button>
+		</div>
+
+		<!-- WebAuthn / Sicherheitsschlüssel -->
+		<div class="card">
+			<h2 class="label mb-4">{$t('security_settings.webauthn')}</h2>
+			<div class="flex items-center justify-between mb-4">
+				<div class="flex items-center gap-2">
+					<div class="w-2 h-2 rounded-full" style="background-color:{security_keys.length > 0 ? 'var(--success)' : 'var(--text-secondary)'}"></div>
+					<span class="text-sm" style="color:var(--text-secondary);">
+						{security_keys.length > 0 ? $t('security_settings.webauthn_available') : $t('security_settings.webauthn_unavailable')}
+					</span>
+				</div>
+				<button onclick={add_security_key} class="btn btn-primary text-sm">
+					{$t('security_settings.add_security_key')}
+				</button>
+			</div>
+			{#if security_keys.length > 0}
+				<div class="flex flex-col gap-2">
+					{#each security_keys as key, i}
+						<div class="flex items-center justify-between rounded-lg px-3 py-2" style="background-color:var(--bg); border:1px solid var(--border);">
+							<span class="text-sm" style="color:var(--text-secondary);">Sicherheitsschlüssel {i + 1}</span>
+							<button onclick={() => remove_security_key(key.id)} class="btn btn-danger text-xs">
+								{$t('words.delete')}
+							</button>
+						</div>
+					{/each}
+				</div>
+			{/if}
 		</div>
 	</div>
-{/await}
+{/if}
 
 {#if totp_data}
 	<TotpSetup bind:totp_data />
