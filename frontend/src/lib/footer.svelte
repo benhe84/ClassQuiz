@@ -8,7 +8,7 @@ SPDX-License-Identifier: MPL-2.0
 	const { t } = getLocalization();
 </script>
 
-<footer class="w-full mt-auto py-5 px-6" style="background-color:#1E293B; border-top:1px solid #6366F133;">
+<footer class="w-full py-5 px-6" style="background-color:#1E293B; border-top:1px solid #6366F133;">
 	<div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
 		<p class="text-sm text-center md:text-left" style="color:#CBD5E1;">
 			{@html $t('footer.self_ads', {

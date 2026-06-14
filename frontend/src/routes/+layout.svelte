@@ -3,59 +3,56 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 <script lang="ts">
-import '../app.css';
-import Navbar from '$lib/navbar.svelte';
-import Footer from '$lib/footer.svelte';
-import { pathname } from '$lib/stores';
-import { navbarVisible } from '$lib/stores.svelte';
-import { initLocalizationContext } from '$lib/i18n';
-import { browser } from '$app/environment';
-import CommandPalette from '$lib/components/commandpalette.svelte';
+	import '../app.css';
+	import Navbar from '$lib/navbar.svelte';
+	import Footer from '$lib/footer.svelte';
+	import { pathname } from '$lib/stores';
+	import { navbarVisible } from '$lib/stores.svelte';
+	import { initLocalizationContext } from '$lib/i18n';
+	import { browser } from '$app/environment';
+	import CommandPalette from '$lib/components/commandpalette.svelte';
 
-interface Props { children?: import('svelte').Snippet; }
-let { children }: Props = $props();
+	interface Props { children?: import('svelte').Snippet; }
+	let { children }: Props = $props();
 
-const plausible_data_url = import.meta.env.VITE_PLAUSIBLE_DATA_URL;
+	const plausible_data_url = import.meta.env.VITE_PLAUSIBLE_DATA_URL;
 
-if (browser) {
-pathname.set(window.location.pathname);
-document.documentElement.classList.add('dark');
-}
+	if (browser) {
+		pathname.set(window.location.pathname);
+		document.documentElement.classList.add('dark');
+	}
 
-let start_language = 'de';
-if (browser) { start_language = localStorage.getItem('language') ?? 'de'; }
-initLocalizationContext(start_language);
+	let start_language = 'de';
+	if (browser) { start_language = localStorage.getItem('language') ?? 'de'; }
+	initLocalizationContext(start_language);
 </script>
 
 {#if navbarVisible.visible}
-<Navbar />
-<div style="height:3.5rem;"></div>
+	<Navbar />
+	<div style="height:3.5rem;"></div>
 {/if}
 
-<main style="flex:1; min-height:0;">
-{@render children?.()}
+<main>
+	{@render children?.()}
 </main>
 
-{#if navbarVisible.visible}
 <Footer />
-{/if}
 
 <CommandPalette />
 
 <style>
-:global(html), :global(body) {
-min-height: 100vh;
-background-color: var(--bg, #0F172A);
-color: var(--text-primary, #F8FAFC);
-}
-:global(body) {
-display: flex;
-flex-direction: column;
-}
-main {
+	:global(html), :global(body) {
+		min-height: 100vh;
+		background-color: var(--bg, #0F172A);
+		color: var(--text-primary, #F8FAFC);
+	}
+	:global(body) {
+		display: flex;
+		flex-direction: column;
+	}
+	main {
 		flex: 1;
-		min-height: 0;
-display: flex;
-flex-direction: column;
-}
+		display: flex;
+		flex-direction: column;
+	}
 </style>

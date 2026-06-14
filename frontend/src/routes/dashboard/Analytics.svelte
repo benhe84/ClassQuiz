@@ -1,98 +1,79 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import type { QuizData } from '$lib/quiz_types';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { getLocalization } from '$lib/i18n';
-
 	const { t } = getLocalization();
 
 	export let quiz: QuizData | undefined = undefined;
 
 	const on_parent_click = (e: Event) => {
-		if (e.target !== e.currentTarget) {
-			return;
-		}
-		quiz = undefined;
+		if (e.target === e.currentTarget) quiz = undefined;
 	};
-	const close_start_game_if_esc_is_pressed = (key: KeyboardEvent) => {
-		if (key.code === 'Escape') {
-			quiz = undefined;
-		}
-	};
+
 	onMount(() => {
-		document.body.addEventListener('keydown', close_start_game_if_esc_is_pressed);
+		document.body.addEventListener('keydown', (key) => {
+			if (key.code === 'Escape') quiz = undefined;
+		});
 	});
 </script>
 
 {#if quiz}
 	<div
-		class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+		class="fixed inset-0 flex items-center justify-center z-50"
+		style="background-color:rgba(0,0,0,0.7);"
 		onclick={on_parent_click}
-		transition:fade={{ duration: 100 }}
+		transition:fade={{ duration: 150 }}
 	>
-		<div
-			class="m-auto bg-white dark:bg-gray-600 rounded-sm shadow-2xl flex p-4 flex-col lg:w-2/3 w-11/12 h-5/6"
-		>
-			<h1 class="text-center text-5xl">{$t('words.analytics')}</h1>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('words.rating')}</h2>
-				<table class="w-fit mx-auto">
-					<tbody>
-						<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.like', { count: 2 })}</th
-							>
-							<th class="p-1 mx-auto">{$t('words.dislike', { count: 2 })}</th>
-						</tr>
-						<tr class="text-left">
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{quiz.likes}</td
-							>
-							<td class="mx-auto p-1">{quiz.dislikes}</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('dashboard.views_n_plays')}</h2>
-				<table class="w-fit mx-auto">
-					<thead>
-						<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.view', { count: 2 })}</th
-							>
-							<th class="p-1 mx-auto">{$t('words.play', { count: 2 })}</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="text-left">
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{quiz.views}</td
-							>
-							<td class="mx-auto p-1">{quiz.plays}</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('words.info')}</h2>
-				<p class="mx-auto max-w-[70%] text-center">
-					{$t('dashboard.info_analytics')}
-				</p>
-			</section>
-			<section class="mt-auto">
-				<p class="mt-6 mx-auto max-w-[70%] text-sm dark:text-gray-200 text-center">
-					Since there's still some space left down here, I guess that I take this
-					opportunity to thank You for using ClassQuiz! Have a great day and continue
-					using ClassQuiz ;)
-				</p>
-			</section>
+		<div class="rounded-2xl shadow-2xl p-6 w-full max-w-lg flex flex-col gap-6" style="background-color:var(--surface); color:var(--text-primary);">
+
+			<!-- Header -->
+			<div class="flex items-center justify-between">
+				<h1 class="text-xl font-bold" style="color:var(--primary);">{$t('words.analytics')}</h1>
+				<button onclick={() => { quiz = undefined; }} class="p-1.5 rounded-lg transition hover:bg-white/10" style="color:var(--text-secondary);">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+				</button>
+			</div>
+
+			<!-- Bewertung -->
+			<div class="rounded-xl p-4" style="background-color:var(--bg);">
+				<p class="label mb-3">{$t('words.rating')}</p>
+				<div class="grid grid-cols-2 gap-3">
+					<div class="rounded-lg p-3 text-center" style="background-color:var(--surface); border:1px solid var(--border);">
+						<p class="text-2xl font-bold" style="color:var(--success);">👍 {quiz.likes}</p>
+						<p class="text-xs mt-1" style="color:var(--text-secondary);">{$t('words.like_plural')}</p>
+					</div>
+					<div class="rounded-lg p-3 text-center" style="background-color:var(--surface); border:1px solid var(--border);">
+						<p class="text-2xl font-bold" style="color:var(--danger);">👎 {quiz.dislikes}</p>
+						<p class="text-xs mt-1" style="color:var(--text-secondary);">{$t('words.dislike_plural')}</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Aufrufe & Spielstarts -->
+			<div class="rounded-xl p-4" style="background-color:var(--bg);">
+				<p class="label mb-3">{$t('dashboard.views_n_plays')}</p>
+				<div class="grid grid-cols-2 gap-3">
+					<div class="rounded-lg p-3 text-center" style="background-color:var(--surface); border:1px solid var(--border);">
+						<p class="text-2xl font-bold" style="color:var(--primary);">{quiz.views}</p>
+						<p class="text-xs mt-1" style="color:var(--text-secondary);">{$t('words.view_plural')}</p>
+					</div>
+					<div class="rounded-lg p-3 text-center" style="background-color:var(--surface); border:1px solid var(--border);">
+						<p class="text-2xl font-bold" style="color:var(--secondary);">{quiz.plays}</p>
+						<p class="text-xs mt-1" style="color:var(--text-secondary);">{$t('words.play_plural')}</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Info -->
+			<div class="rounded-xl p-4 text-sm" style="background-color:var(--bg); color:var(--text-secondary);">
+				<p class="label mb-2">{$t('words.info')}</p>
+				<p>{$t('dashboard.info_analytics')}</p>
+			</div>
 		</div>
 	</div>
 {/if}

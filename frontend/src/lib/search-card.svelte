@@ -1,47 +1,31 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import { getLocalization } from '$lib/i18n';
-
 	const { t } = getLocalization();
 	import ImportedOrNot from '$lib/view_quiz/imported_or_not.svelte';
 	let { quiz } = $props();
 </script>
 
-<div class="flex justify-center">
-	<a href="/view/{quiz.id}" class="h-max w-fit">
-		<div class="max-w-md py-4 px-8 bg-white shadow-lg rounded-lg my-20 dark:bg-slate-800">
-			<div>
-				<div class="flex w-full items-center">
-					<h2
-						class="text-gray-800 dark:text-gray-200 text-3xl font-semibold truncate pr-2"
-					>
-						{@html quiz.title}
-					</h2>
-					<span class="inline-block ml-auto">
-						<ImportedOrNot imported={quiz.imported_from_kahoot} />
-					</span>
-				</div>
-				<p
-					class="mt-2 text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis max-h-[4.5rem] block"
-				>
-					{@html quiz.description}
-				</p>
-			</div>
-			<div class="flex mt-4">
-				<span
-					>{#if quiz.imported_from_kahoot === true}
-						{$t('explore_page.imported_by')}
-					{:else}
-						{$t('explore_page.made_by')}
-					{/if}
-					{@html quiz.user}</span
-				>
-			</div>
+<a href="/view/{quiz.id}" class="block group">
+	<div class="card flex flex-col gap-3 h-full hover:shadow-lg transition group-hover:border-indigo-500/50" style="border:1px solid var(--border);">
+		<div class="flex items-start justify-between gap-2">
+			<h2 class="font-semibold text-base truncate flex-1">{@html quiz.title}</h2>
+			<span class="shrink-0"><ImportedOrNot imported={quiz.imported_from_kahoot} /></span>
 		</div>
-	</a>
-</div>
+		{#if quiz.description}
+			<p class="text-sm line-clamp-2" style="color:var(--text-secondary);">{@html quiz.description}</p>
+		{/if}
+		<div class="mt-auto pt-2 flex items-center gap-2" style="border-top:1px solid var(--border);">
+			<svg class="w-3.5 h-3.5 shrink-0" style="color:var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+			</svg>
+			<span class="text-xs" style="color:var(--text-secondary);">
+				{quiz.imported_from_kahoot ? $t('explore_page.imported_by') : $t('explore_page.made_by')}
+				<span class="font-medium" style="color:var(--text-primary);">{@html quiz.user}</span>
+			</span>
+		</div>
+	</div>
+</a>
