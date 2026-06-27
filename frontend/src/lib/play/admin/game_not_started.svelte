@@ -55,7 +55,7 @@ SPDX-License-Identifier: MPL-2.0
 			<div class="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
 				<p class="text-sm font-semibold uppercase tracking-wider text-[#475569]">QR-Code scannen</p>
 				<button
-					onclick={() => (fullscreen_open = true)}
+					onclick="{() => (fullscreen_open = true)}"
 					class="group relative overflow-hidden rounded-2xl bg-white p-3 shadow-lg transition hover:scale-105"
 					aria-label="QR-Code vergrößern"
 				>
