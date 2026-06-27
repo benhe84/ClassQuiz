@@ -126,15 +126,28 @@ body {
 }
 
 .input {
-	background-color: var(--surface);
-	color: var(--text-primary);
-	border: 1px solid var(--border);
-	border-radius: 0.5rem;
-	padding: 0.5rem 0.75rem;
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  caret-color: var(--text-primary);
+  border-radius: 0.5rem;
+  /*padding: 0.5rem 0.75rem;
 	font-size: 0.875rem;
 	outline: none;
 	transition: border-color 0.15s;
-	width: 100%;
+	width: 100%;*/
+}
+
+/* wichtig für Platzhalter */
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+/* verhindert Autofill-Kontrastprobleme (Chrome) */
+.input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
 }
 .input:focus { border-color: var(--primary); }
 
