@@ -33,7 +33,7 @@ SPDX-License-Identifier: MPL-2.0
 		<div style="height:3.5rem;"></div>
 	{/if}
 
-	<main class="flex-1">
+	<main class="flex-1 flex flex-col">
 		{@render children?.()}
 	</main>
 
