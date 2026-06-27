@@ -1,6 +1,5 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
 
@@ -18,102 +17,102 @@ SPDX-License-Identifier: MPL-2.0
 	}
 
 	let { bg_color, socket_game_controls, game_token, game_state = $bindable() }: Props = $props();
-
 	const { t } = getLocalization();
 
 	const show_solutions = () => {
 		socket_game_controls.show_solutions();
 		game_state.timer_res = '0';
 	};
+
+	let q = $derived(game_state.quiz_data.questions);
+	let idx = $derived(game_state.selected_question);
+	let is_last = $derived(idx + 1 === q.length);
+	let is_slide = $derived(q[idx]?.type === QuizQuestionType.SLIDE);
+	let time_up = $derived(game_state.timer_res === '0');
+	let has_results = $derived(game_state.question_results !== null);
+	let final_not_shown = $derived(JSON.stringify(game_state.final_results) === JSON.stringify([null]));
 </script>
 
 <div
-	class="fixed top-0 w-full h-10 z-20 grid grid-cols-2"
-	style="background: {bg_color ? bg_color : 'transparent'}"
-	class:text-black={bg_color}
+	class="fixed top-0 w-full z-20 flex items-center justify-between px-4 h-12 border-b border-white/10"
+	style="background-color: {bg_color ? bg_color : '#1E293B'}"
 >
-	<p class="mr-auto ml-0 col-start-1 col-end-1">
-		{game_state.selected_question === -1 ? '0' : game_state.selected_question + 1}
-		/{game_state.quiz_data.questions.length}
-	</p>
-	<div class="justify-self-end ml-auto mr-0 col-start-3 col-end-3">
-		{#if game_state.selected_question + 1 === game_state.quiz_data.questions.length && ((game_state.timer_res === '0' && game_state.question_results !== null) || game_state.quiz_data?.questions?.[game_state.selected_question]?.type === QuizQuestionType.SLIDE)}
-			{#if JSON.stringify(game_state.final_results) === JSON.stringify([null])}
+	<!-- Fortschritt -->
+	<div class="flex items-center gap-2">
+		<span class="text-sm font-bold text-[#F8FAFC]">
+			{idx === -1 ? 0 : idx + 1}/{q.length}
+		</span>
+		<div class="hidden sm:flex gap-1">
+			{#each q as _, i}
+				<div
+					class="h-1.5 w-6 rounded-full transition"
+					style="background-color: {i <= idx ? '#6366F1' : 'rgba(255,255,255,0.15)'}"
+				></div>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Aktions-Button -->
+	<div>
+		{#if is_last && ((time_up && has_results) || is_slide)}
+			{#if final_not_shown}
 				<button
 					onclick={() => socket_game_controls.get_final_results()}
-					class="admin-button"
-					>{$t('admin_page.get_final_results')}
+					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+				>
+					{$t('admin_page.get_final_results')}
 				</button>
 			{/if}
-		{:else if game_state.timer_res === '0' || game_state.selected_question === -1}
-			{#if (game_state.selected_question + 1 !== game_state.quiz_data.questions.length && game_state.question_results !== null) || game_state.selected_question === -1}
+		{:else if time_up || idx === -1}
+			{#if ((idx + 1 !== q.length && has_results) || idx === -1)}
 				<button
-					onclick={() => {
-						socket_game_controls.set_question_number(game_state.selected_question + 1);
-					}}
-					class="admin-button"
-					>{$t('admin_page.next_question', {
-						question: game_state.selected_question + 2
-					})}
+					onclick={() => socket_game_controls.set_question_number(idx + 1)}
+					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+				>
+					{$t('admin_page.next_question', { question: idx + 2 })}
 				</button>
 			{/if}
-			{#if game_state.question_results === null && game_state.selected_question !== -1}
-				{#if game_state.quiz_data.questions[game_state.selected_question].type === QuizQuestionType.SLIDE}
+			{#if !has_results && idx !== -1}
+				{#if is_slide}
 					<button
-						onclick={() => {
-							socket_game_controls.set_question_number(
-								game_state.selected_question + 1
-							);
-						}}
-						class="admin-button"
-						>{$t('admin_page.next_question', {
-							question: game_state.selected_question + 2
-						})}
+						onclick={() => socket_game_controls.set_question_number(idx + 1)}
+						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					>
+						{$t('admin_page.next_question', { question: idx + 2 })}
 					</button>
-				{:else if game_state.quiz_data.questions[game_state.selected_question]?.hide_results === true}
+				{:else if q[idx]?.hide_results === true}
 					<button
 						onclick={() => {
-							socket_game_controls.get_question_results(
-								game_token,
-								game_state.shown_question_now
-							);
-							setTimeout(() => {
-								socket_game_controls.set_question_number(
-									game_state.selected_question + 1
-								);
-							}, 200);
+							socket_game_controls.get_question_results(game_token, game_state.shown_question_now);
+							setTimeout(() => socket_game_controls.set_question_number(idx + 1), 200);
 						}}
-						class="admin-button"
-						>{$t('admin_page.next_question', {
-							question: game_state.selected_question + 2
-						})}
+						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					>
+						{$t('admin_page.next_question', { question: idx + 2 })}
 					</button>
 				{:else}
 					<button
-						onclick={() =>
-							socket_game_controls.get_question_results(
-								game_token,
-								game_state.shown_question_now
-							)}
-						class="admin-button"
-						>{$t('admin_page.show_results')}
+						onclick={() => socket_game_controls.get_question_results(game_token, game_state.shown_question_now)}
+						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					>
+						{$t('admin_page.show_results')}
 					</button>
 				{/if}
 			{/if}
-		{:else if game_state.selected_question !== -1}
-			{#if game_state.quiz_data.questions[game_state.selected_question].type === QuizQuestionType.SLIDE}
+		{:else if idx !== -1}
+			{#if is_slide}
 				<button
-					onclick={() => {
-						socket_game_controls.set_question_number(game_state.selected_question + 1);
-					}}
-					class="admin-button"
-					>{$t('admin_page.next_question', {
-						question: game_state.selected_question + 2
-					})}
+					onclick={() => socket_game_controls.set_question_number(idx + 1)}
+					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+				>
+					{$t('admin_page.next_question', { question: idx + 2 })}
 				</button>
 			{:else}
-				<button onclick={show_solutions} class="admin-button"
-					>{$t('admin_page.stop_time_and_solutions')}
+				<button
+					onclick={show_solutions}
+					class="rounded-xl bg-red-500/80 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-red-500"
+				>
+					{$t('admin_page.stop_time_and_solutions')}
 				</button>
 			{/if}
 		{/if}

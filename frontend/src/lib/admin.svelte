@@ -15,7 +15,7 @@ SPDX-License-Identifier: MPL-2.0
 	import type { IGameState } from '$lib/play/admin/game_state.ts';
 
 	const { t } = getLocalization();
-	const default_colors = ['#D6EDC9', '#B07156', '#7F7057', '#4E6E58'];
+	const default_colors = ['#6366F1', '#EC4899', '#F59E0B', '#10B981'];
 
 	let final_results_clicked = $state(false);
 	let timer_interval: NodeJS.Timeout;
@@ -88,13 +88,12 @@ SPDX-License-Identifier: MPL-2.0
 	<Controls {bg_color} {socket_game_controls} {game_token} bind:game_state />
 {/if}
 {#if game_state.timer_res !== '0' && game_state.selected_question >= 0}
-	<span
-		class="fixed top-0 bg-red-500 h-8 transition-all"
-		class:mt-10={game_state.control_visible}
-		style="width: {(100 /
-			parseInt(game_state.quiz_data.questions[game_state.selected_question].time)) *
-			parseInt(game_state.timer_res)}vw"
-	></span>
+	<div
+		class="fixed left-0 h-1 bg-[#6366F1] transition-all duration-1000 z-30"
+		class:top-12={game_state.control_visible}
+		class:top-0={!game_state.control_visible}
+		style="width: {(100 / parseInt(game_state.quiz_data.questions[game_state.selected_question].time)) * parseInt(game_state.timer_res)}vw"
+	></div>
 {/if}
 
 <div
@@ -153,19 +152,17 @@ SPDX-License-Identifier: MPL-2.0
 	{/if}
 	<br />
 	{#if game_state.selected_question === -1}
-		<div class="flex flex-col justify-center w-screen h-full">
-			<h1 class="text-7xl text-center">{@html game_state.quiz_data.title}</h1>
-			<p class="text-3xl pt-8 text-center">{@html game_state.quiz_data.description}</p>
+		<div class="flex flex-col items-center justify-center w-screen h-full gap-6 px-8">
 			{#if game_state.quiz_data.cover_image}
-				<div class="flex justify-center align-middle items-center">
-					<div class="h-[30vh] m-auto w-auto mt-12">
-						<img
-							class="max-h-full max-w-full block"
-							src="/api/v1/storage/download/{game_state.quiz_data.cover_image}"
-							alt="Not provided"
-						/>
-					</div>
-				</div>
+				<img
+					class="max-h-[25vh] w-auto rounded-2xl shadow-xl border border-white/10"
+					src="/api/v1/storage/download/{game_state.quiz_data.cover_image}"
+					alt="Quiz-Titelbild"
+				/>
+			{/if}
+			<h1 class="text-5xl font-bold text-center text-[#F8FAFC] leading-tight">{@html game_state.quiz_data.title}</h1>
+			{#if game_state.quiz_data.description}
+				<p class="text-2xl text-center text-[#94A3B8]">{@html game_state.quiz_data.description}</p>
 			{/if}
 		</div>
 	{/if}

@@ -1,14 +1,11 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	// import AudioPlayer from '$lib/play/audio_player.svelte';
 	import ControllerCodeDisplay from '$lib/components/controller/code.svelte';
 	import { getLocalization } from '$lib/i18n';
-	import GrayButton from '$lib/components/buttons/gray.svelte';
 	import { fade } from 'svelte/transition';
 	import { SocketGameControls } from '$lib/play/admin/socket_game_controls.ts';
 	import type { GameState } from '$lib/play/admin/game_state';
@@ -29,120 +26,128 @@ SPDX-License-Identifier: MPL-2.0
 
 	let fullscreen_open = $state(false);
 	const { t } = getLocalization();
-	let play_music = $state(false);
 
-	if (cqc_code === 'null') {
-		cqc_code = null;
-	}
+	if (cqc_code === 'null') cqc_code = null;
+
+	let player_count = $derived(game_state.players.length);
 </script>
 
-<div class="w-full h-full">
-	<!-- <AudioPlayer bind:play={play_music} /> -->
-	<div class="grid grid-cols-3 pt-12">
-		<!--mt-12 -->
-		<div class="flex justify-center">
-			<p class="m-auto text-2xl">
-				{$t('play_page.join_description', {
-					url:
-						window.location.host === 'classquiz.de'
-							? 'cquiz.de'
-							: `${window.location.host}/play`,
-					pin: game_pin
-				})}
-			</p>
+<div class="min-h-screen w-full bg-[#0F172A] text-[#F8FAFC]">
+
+	<!-- Header -->
+	<div class="border-b border-white/10 bg-[#1E293B] px-6 py-4">
+		<div class="mx-auto flex max-w-6xl items-center justify-between">
+			<div class="flex items-center gap-3">
+				<div class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></div>
+				<span class="text-sm font-medium text-[#94A3B8]">Warte auf Teilnehmende…</span>
+			</div>
+			<div class="flex items-center gap-2 rounded-xl bg-[#6366F1]/20 px-4 py-2">
+				<span class="text-sm text-[#94A3B8]">{$t('words.pin')}:</span>
+				<span class="select-all font-mono text-xl font-bold tracking-widest text-[#6366F1]">{game_pin}</span>
+			</div>
 		</div>
-		<img
-			onclick={() => (fullscreen_open = true)}
-			alt="QR code to join the game"
-			src="/api/v1/utils/qr/{game_pin}"
-			class="block mx-auto w-1/2 dark:bg-white shadow-2xl rounded-sm hover:cursor-pointer"
-		/>
-		{#if cqc_code}
-			<div class="m-auto">
-				<div class="flex justify-center my-4">
-					<p class="m-auto text-2xl">
-						{#if game_state.players.length <= 1}
-							{$t('play_page.players_waiting', {
-								count: game_state.players.length ?? 0
-							})}
+	</div>
+
+	<div class="mx-auto max-w-6xl px-6 py-10">
+		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+
+			<!-- QR-Code -->
+			<div class="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
+				<p class="text-sm font-semibold uppercase tracking-wider text-[#475569]">QR-Code scannen</p>
+				<button
+					onclick={() => (fullscreen_open = true)}
+					class="group relative overflow-hidden rounded-2xl bg-white p-3 shadow-lg transition hover:scale-105"
+					aria-label="QR-Code vergrößern"
+				>
+					<img
+						alt="QR-Code zum Beitreten"
+						src="/api/v1/utils/qr/{game_pin}"
+						class="block h-40 w-40 object-contain"
+					/>
+					<div class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/0 transition group-hover:bg-black/20">
+						<svg class="h-8 w-8 text-white opacity-0 transition group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+						</svg>
+					</div>
+				</button>
+				<p class="text-center text-sm text-[#94A3B8]">
+					{$t('play_page.join_description', {
+						url: window.location.host === 'classquiz.de' ? 'cquiz.de' : `${window.location.host}/play`,
+						pin: game_pin
+					})}
+				</p>
+			</div>
+
+			<!-- Spieler-Zähler + Start -->
+			<div class="flex flex-col items-center justify-center gap-6 rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
+				<div class="text-center">
+					<p class="text-7xl font-bold text-[#F8FAFC]">{player_count}</p>
+					<p class="mt-2 text-sm font-medium text-[#94A3B8]">
+						{#if player_count === 1}
+							{$t('play_page.players_waiting', { count: player_count })}
 						{:else}
-							{$t('play_page.players_waiting_plural', {
-								count: game_state.players.length ?? 0
-							})}
+							{$t('play_page.players_waiting_plural', { count: player_count })}
 						{/if}
 					</p>
 				</div>
-				<div class="flex-col flex justify-center">
-					<p class="mx-auto">{$t('play_page.join_by_entering_code')}</p>
+
+				<button
+					disabled={player_count < 1}
+					onclick={() => socket_game_controls.start_game()}
+					class="w-full rounded-xl bg-[#6366F1] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#5558E3] disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					{$t('admin_page.start_game')}
+				</button>
+			</div>
+
+			<!-- Controller-Code oder Spielerliste -->
+			<div class="rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
+				{#if cqc_code}
+					<p class="mb-3 text-sm font-semibold uppercase tracking-wider text-[#475569]">Controller-Code</p>
+					<p class="mb-3 text-sm text-[#94A3B8]">{$t('play_page.join_by_entering_code')}</p>
 					<ControllerCodeDisplay code={cqc_code} />
-				</div>
-			</div>
-		{:else}
-			<div class="flex justify-center">
-				<p class="m-auto text-2xl">
-					{#if game_state.players.length <= 1}
-						{$t('play_page.players_waiting', {
-							count: game_state.players.length ?? 0
-						})}
+				{:else}
+					<p class="mb-4 text-sm font-semibold uppercase tracking-wider text-[#475569]">Teilnehmende</p>
+					{#if game_state.players.length > 0}
+						<div class="flex flex-wrap gap-2">
+							{#each game_state.players as player}
+								<button
+									onclick={() => socket_game_controls.kick_player(player.username, game_state.players)}
+									class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-[#F8FAFC] transition hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400"
+									title="Kick {player.username}"
+								>
+									{player.username}
+								</button>
+							{/each}
+						</div>
 					{:else}
-						{$t('play_page.players_waiting_plural', {
-							count: game_state.players.length ?? 0
-						})}
+						<div class="flex h-32 items-center justify-center">
+							<p class="text-sm text-[#475569]">Noch niemand beigetreten…</p>
+						</div>
 					{/if}
-				</p>
+				{/if}
 			</div>
-		{/if}
-	</div>
-	<p class="text-3xl text-center">
-		{$t('words.pin')}: <span class="select-all">{game_pin}</span>
-	</p>
-	<div class="flex justify-center w-full mt-4">
-		<div>
-			<GrayButton
-				disabled={game_state.players.length < 1}
-				onclick={() => {
-					socket_game_controls.start_game();
-				}}
-				>{$t('admin_page.start_game')}
-			</GrayButton>
 		</div>
-	</div>
-	<div class="flex flex-row w-full mt-4 px-10 flex-wrap">
-		{#if game_state.players.length > 0}
-			{#each game_state.players as player}
-				<div class="p-2 m-2 border-2 border-[#B07156] rounded-sm hover:cursor-pointer">
-					<span
-						class="hover:line-through text-lg"
-						onclick={() => {
-							socket_game_controls.kick_player(player.username, game_state.players);
-						}}>{player.username}</span
-					>
-					<!--					<button>{$t('words.kick')}</button>-->
-				</div>
-			{/each}
-		{/if}
 	</div>
 </div>
 
+<!-- QR Vollbild -->
 {#if fullscreen_open}
 	<div
-		class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 flex p-2"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
 		transition:fade|global={{ duration: 80 }}
 		onclick={() => (fullscreen_open = false)}
 		tabindex="0"
 		role="button"
-		aria-label="Close modal"
-		onkeydown={(e) =>
-			e.key === 'Enter' || e.key === ' '
-				? () => {
-						fullscreen_open = false;
-					}
-				: null}
+		aria-label="Schließen"
+		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') ? (fullscreen_open = false) : null}
 	>
-		<img
-			alt="QR code to join the game"
-			src="/api/v1/utils/qr/{game_pin}"
-			class="object-contain rounded-sm m-auto h-full bg-white"
-		/>
+		<div class="rounded-3xl bg-white p-6 shadow-2xl">
+			<img
+				alt="QR-Code zum Beitreten"
+				src="/api/v1/utils/qr/{game_pin}"
+				class="h-72 w-72 object-contain"
+			/>
+		</div>
 	</div>
 {/if}
