@@ -190,8 +190,8 @@ SPDX-License-Identifier: MPL-2.0
 					bind:value={search_term}
 					oninput={search}
 					placeholder={$t('dashboard.search_for_own_quizzes')}
-					w-full peer bg-transparent h-10 rounded-lg text-gray-700 dark:text-white placeholder-transparent ring-2 px-2 ring-gray-500 focus:ring-sky-600 focus:outline-hidden focus:border-rose-600 ring-red-700
-                />
+					class="w-full pl-9 pr-4 py-2 rounded-xl border shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+				/>
 			</div>
 			{#if search_term}
 				<button
