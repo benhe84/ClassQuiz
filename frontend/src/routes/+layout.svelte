@@ -12,6 +12,7 @@ SPDX-License-Identifier: MPL-2.0
 	import { initLocalizationContext } from '$lib/i18n';
 	import { browser } from '$app/environment';
 	import CommandPalette from '$lib/components/commandpalette.svelte';
+	import AddNewQuestionPopup from '../lib/editor/AddNewQuestionPopup.svelte';
 
 	interface Props { children?: import('svelte').Snippet; }
 	let { children }: Props = $props();
@@ -20,7 +21,15 @@ SPDX-License-Identifier: MPL-2.0
 
 	if (browser) {
 		pathname.set(window.location.pathname);
-		document.documentElement.classList.add('dark');
+		if (
+			localStorage.theme === 'dark' ||
+			(!('theme' in localStorage) &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
 	}
 
 	let start_language = 'de';
