@@ -87,7 +87,7 @@
 	<title>ClassQuiz - Import</title>
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center p-6">
+<div class="flex items-center justify-center p-6">
 	<div class="w-full max-w-5xl">
 
 		<h1 class="text-3xl font-semibold text-center mb-8">
