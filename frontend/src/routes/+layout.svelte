@@ -27,7 +27,7 @@ SPDX-License-Identifier: MPL-2.0
 	initLocalizationContext(start_language);
 </script>
 
-<div class="layout">
+<div class="layout flex flex-col min-h-screen">
 	{#if navbarVisible.visible}
 		<Navbar />
 		<div style="height:3.5rem;"></div>
