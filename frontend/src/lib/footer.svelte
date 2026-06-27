@@ -18,9 +18,9 @@ SPDX-License-Identifier: MPL-2.0
 					interpolation: { escapeValue: false }
 				})}
 			</p>
-			<span class="hidden md:inline" style="color:#334155;">·</span>
-			<p style="color:#475569;">
-				Design aktualisiert von
+			<span class="hidden md:inline">|</span>
+			<p>
+				Designupdate
 				<a href="https://github.com/benhe84" target="_blank" style="color:#6366F1;text-decoration:underline;">benhe84</a>
 			</p>
 		</div>
