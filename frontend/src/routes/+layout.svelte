@@ -27,16 +27,18 @@ SPDX-License-Identifier: MPL-2.0
 	initLocalizationContext(start_language);
 </script>
 
-{#if navbarVisible.visible}
-	<Navbar />
-	<div style="height:3.5rem;"></div>
-{/if}
+<div class="layout">
+	{#if navbarVisible.visible}
+		<Navbar />
+		<div style="height:3.5rem;"></div>
+	{/if}
 
-<main>
-	{@render children?.()}
-</main>
+	<main>
+		{@render children?.()}
+	</main>
 
-<Footer />
+	<Footer />
+</div>
 
 <CommandPalette />
 
