@@ -445,15 +445,6 @@ SPDX-License-Identifier: MPL-2.0
 		</div>
 	</section>
 </div>
-{#if newsletterModalOpen}
-	<div
-		class="fixed bottom-8 right-5 bg-white rounded-lg h-fit w-11/12 ml-5 lg:w-2/12 z-50 p-2 dark:bg-gray-700"
-		transition:fly|global
-	>
-		<Newsletter bind:open={newsletterModalOpen} />
-	</div>
-{/if}
-<Footer />
 
 <style>
 	.why-classquiz::-webkit-scrollbar {
