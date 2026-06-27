@@ -43,18 +43,15 @@ SPDX-License-Identifier: MPL-2.0
 <CommandPalette />
 
 <style>
-	:global(html), :global(body) {
-		min-height: 100vh;
-		background-color: var(--bg, #0F172A);
-		color: var(--text-primary, #F8FAFC);
-	}
 	:global(body) {
-		display: flex;
-		flex-direction: column;
-	}
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-	}
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+:global(body > div) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 </style>
