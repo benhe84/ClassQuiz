@@ -68,8 +68,7 @@ let analytics_quiz_selected: undefined | QuizData = $state(undefined);
 <Analytics bind:quiz={analytics_quiz_selected} />
 <CommandpaletteNotice />
 
-<div class="flex flex-col flex-1">
-<main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
+<div class="flex flex-col flex-1 max-w-7xl w-full mx-auto px-4 py-8">
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
 <a href="/create" class="flex flex-col items-center gap-2 p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow transition">
@@ -164,7 +163,6 @@ Starten
 {/each}
 </div>
 {/if}
-</main>
 </div>
 
 {#if download_id}
