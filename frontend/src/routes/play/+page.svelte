@@ -12,10 +12,14 @@ SPDX-License-Identifier: MPL-2.0
 	import ShowTitle from '$lib/play/title.svelte';
 	import Question from '$lib/play/question.svelte';
 	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import { footerVisible } from '$lib/stores.svelte';
 	import ShowEndScreen from '$lib/play/admin/final_results.svelte';
 	import KahootResults from '$lib/play/results_kahoot.svelte';
 	import { getLocalization } from '$lib/i18n';
 	import Cookies from 'js-cookie';
+	
+	footerVisible.visible = false;
+	
 	const { t } = getLocalization();
 
 	interface Props {

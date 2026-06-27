@@ -8,6 +8,7 @@ SPDX-License-Identifier: MPL-2.0
 	import Footer from '$lib/footer.svelte';
 	import { pathname } from '$lib/stores';
 	import { navbarVisible } from '$lib/stores.svelte';
+	import { footerVisible } from '$lib/stores.svelte';
 	import { initLocalizationContext } from '$lib/i18n';
 	import { browser } from '$app/environment';
 	import CommandPalette from '$lib/components/commandpalette.svelte';
@@ -36,8 +37,9 @@ SPDX-License-Identifier: MPL-2.0
 	<main class="flex-1 flex flex-col">
 		{@render children?.()}
 	</main>
-
-	<Footer />
+	{#if footerVisible.visible}
+    	<Footer />
+	{/if}
 </div>
 
 <CommandPalette />

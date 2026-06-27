@@ -7,6 +7,7 @@ SPDX-License-Identifier: MPL-2.0
 	import { socket } from '$lib/socket';
 	import { getLocalization } from '$lib/i18n';
 	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import { footerVisible } from '$lib/stores.svelte';
 	import SomeAdminScreen from '$lib/admin.svelte';
 	import GameNotStarted from '$lib/play/admin/game_not_started.svelte';
 	import { browser } from '$app/environment';
@@ -19,6 +20,7 @@ SPDX-License-Identifier: MPL-2.0
 	import type { Player, PlayerAnswer } from '$lib/admin';
 	import { tinykeys } from '$lib/tinykeys';
 
+	footerVisible.visible = false;
 	navbarVisible.visible = false;
 	const { t } = getLocalization();
 
