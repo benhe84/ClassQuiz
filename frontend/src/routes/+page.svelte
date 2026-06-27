@@ -212,8 +212,8 @@ SPDX-License-Identifier: MPL-2.0
 							/>
 						</svg>
 					</div>
-					<h5 class="text-xl w-fit dark:text-black">{$t('words.create')}</h5>
-					<p class="dark:text-black">{$t('index_page.create_a_quiz_from_scratch')}</p>
+					<h5 class="text-xl w-fit text-black">{$t('words.create')}</h5>
+					<p class="text-black">{$t('index_page.create_a_quiz_from_scratch')}</p>
 				</div>
 				<div
 					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
@@ -247,8 +247,8 @@ SPDX-License-Identifier: MPL-2.0
 							/>
 						</svg>
 					</div>
-					<h5 class="text-xl dark:text-black">{$t('words.find')}</h5>
-					<p class="dark:text-black">{$t('index_page.find_or_explore')}</p>
+					<h5 class="text-xl text-black">{$t('words.find')}</h5>
+					<p class="text-black">{$t('index_page.find_or_explore')}</p>
 				</div>
 			</div>
 		</div>
@@ -327,8 +327,8 @@ SPDX-License-Identifier: MPL-2.0
 							/>
 						</svg>
 					</div>
-					<h5 class="text-xl w-fit dark:text-black">{$t('index_page.select_answer')}</h5>
-					<p class="dark:text-black">{$t('index_page.choose_answer_wisely')}</p>
+					<h5 class="text-xl w-fit text-black">{$t('index_page.select_answer')}</h5>
+					<p class="text-black">{$t('index_page.choose_answer_wisely')}</p>
 				</div>
 				<div
 					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
@@ -362,8 +362,8 @@ SPDX-License-Identifier: MPL-2.0
 							/>
 						</svg>
 					</div>
-					<h5 class="text-xl dark:text-black">{$t('index_page.view_results')}</h5>
-					<p class="dark:text-black">{$t('index_page.check_if_chosen_wisely')}</p>
+					<h5 class="text-xl text-black">{$t('index_page.view_results')}</h5>
+					<p class="text-black">{$t('index_page.check_if_chosen_wisely')}</p>
 				</div>
 				<div
 					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
@@ -397,8 +397,8 @@ SPDX-License-Identifier: MPL-2.0
 							/>
 						</svg>
 					</div>
-					<h5 class="text-xl dark:text-black">{$t('index_page.list_winners')}</h5>
-					<p class="dark:text-black">{$t('index_page.get_ranking_and_winners')}</p>
+					<h5 class="text-xl text-black">{$t('index_page.list_winners')}</h5>
+					<p class="text-black">{$t('index_page.get_ranking_and_winners')}</p>
 				</div>
 			</div>
 		</div>
@@ -416,7 +416,7 @@ SPDX-License-Identifier: MPL-2.0
 		>
 			<div>
 				<div class="p-12 rounded-lg flex justify-center items-center h-full">
-					<p class="dark:text-black">
+					<p class="text-black">
 						{classquiz_reasons[selected_classquiz_reason].content}
 					</p>
 				</div>
@@ -438,7 +438,7 @@ SPDX-License-Identifier: MPL-2.0
 						class:shadow-2xl={selected_classquiz_reason === index}
 						class:opacity-70={selected_classquiz_reason !== index}
 					>
-						<h5 class="text-xl dark:text-black">{reason.headline}</h5>
+						<h5 class="text-xl text-black">{reason.headline}</h5>
 					</div>
 				{/each}
 			</div>
