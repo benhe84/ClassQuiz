@@ -25,7 +25,7 @@ SPDX-License-Identifier: MPL-2.0
 	const { t } = getLocalization();
 
 	// Moderne Farben & Unicode-Symbole
-	const modern_colors = ['#6366F1', '#EC4899', '#F59E0B', '#10B981'];
+	default_colors = ['#6366F1', '#EC4899', '#F59E0B', '#10B981'];
 
 	let circular_progress = $derived.by(() => {
 		try {
@@ -36,7 +36,7 @@ SPDX-License-Identifier: MPL-2.0
 	});
 
 	const get_color = (answer: any, i: number): string =>
-		answer.color ?? modern_colors[i % 4];
+		answer.color ?? default_colors[i % 4];
 </script>
 
 <div class="flex flex-col w-full px-6 pt-4 pb-2">
