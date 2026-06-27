@@ -19,3 +19,6 @@ SPDX-License-Identifier: MPL-2.0
 <div class="min-h-screen flex flex-col">
 	{@render children?.()}
 </div>
+<div class="pt-4">
+	<Footer />
+</div>
