@@ -24,7 +24,7 @@ async def _download_image(url: str) -> bytes:
         return await resp.read()
 
 
-DEFAULT_COLORS = DEFAULT_COLORS = ['#6366F1', '#EC4899', '#F59E0B', '#10B981']
+DEFAULT_COLORS = ['#6366F1', '#EC4899', '#F59E0B', '#10B981']
 
 
 async def handle_image_upload(url: str, user: User) -> StorageItem:
