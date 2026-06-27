@@ -116,8 +116,7 @@ SPDX-License-Identifier: MPL-2.0
 			<!-- Aktions-Buttons -->
 			<div class="flex flex-wrap justify-center gap-3">
 			{#if quiz.imported_from_kahoot && quiz.kahoot_id}
-				<a
-					href="https://create.kahoot.it/details/{quiz.kahoot_id}"
+				<a href="https://create.kahoot.it/details/{quiz.kahoot_id}"
 					target="_blank"
 					class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#F8FAFC] transition hover:bg-white/10"
 				>
@@ -181,7 +180,7 @@ SPDX-License-Identifier: MPL-2.0
 
 			<div class="mt-4 flex justify-center">
 				
-					href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
+				<a href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
 					class="text-xs text-[#475569] underline hover:text-[#94A3B8]"
 				>
 					{$t('words.report')}
