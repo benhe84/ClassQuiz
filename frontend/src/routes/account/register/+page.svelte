@@ -203,7 +203,9 @@ SPDX-License-Identifier: MPL-2.0
 							<!--						<div class='flex items-center justify-between mt-4 w-full'>-->
 							<input type="checkbox" name="tos_accept" class="ml-3" />
 							<label class="text-sm text-gray-600 dark:text-gray-200">
-								{$t('register_page.tos?')}
+								I agree to the <a href="/docs/tos" class="underline"
+									>Terms of Service</a
+								>.
 							</label>
 						</div>
 
