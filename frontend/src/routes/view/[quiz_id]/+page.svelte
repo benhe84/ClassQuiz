@@ -1,4 +1,3 @@
-cat > /opt/ClassQuiz/frontend/src/routes/view/\[quiz_id\]/+page.svelte << 'SVELTE_EOF'
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
@@ -116,16 +115,15 @@ SPDX-License-Identifier: MPL-2.0
 
 			<!-- Aktions-Buttons -->
 			<div class="flex flex-wrap justify-center gap-3">
-				{#if quiz.imported_from_kahoot && quiz.kahoot_id}
-					
-						href="https://create.kahoot.it/details/{quiz.kahoot_id}"
-						target="_blank"
-						class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#F8FAFC] transition hover:bg-white/10"
-					>
-						{$t('view_quiz_page.view_on_kahoot')}
-					</a>
-				{/if}
-
+			{#if quiz.imported_from_kahoot && quiz.kahoot_id}
+				<a
+					href="https://create.kahoot.it/details/{quiz.kahoot_id}"
+					target="_blank"
+					class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#F8FAFC] transition hover:bg-white/10"
+				>
+					{$t('view_quiz_page.view_on_kahoot')}
+				</a>
+			{/if}
 				<!-- Spiel starten -->
 				{#if logged_in}
 					<button
@@ -152,7 +150,7 @@ SPDX-License-Identifier: MPL-2.0
 
 				<!-- Üben -->
 				
-					href="/practice?quiz_id={quiz.id}"
+				<a href="/practice?quiz_id={quiz.id}"
 					class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#F8FAFC] transition hover:bg-white/10"
 				>
 					{$t('words.practice')}
