@@ -54,4 +54,9 @@ SPDX-License-Identifier: MPL-2.0
     display: flex;
     flex-direction: column;
 }
+.layout {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
 </style>
