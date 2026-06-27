@@ -126,7 +126,7 @@ body {
 }
 
 .input {
-	background-color: var(--bg);
+	background-color: var(--surface);
 	color: var(--text-primary);
 	border: 1px solid var(--border);
 	border-radius: 0.5rem;
