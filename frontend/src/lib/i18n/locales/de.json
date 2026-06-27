@@ -72,7 +72,8 @@
         "greeting": "Schön, dich kennenzulernen!",
         "create_account": "Konto erstellen",
         "forgot_password?": "Passwort vergessen?",
-        "already_have_account?": "Hast du bereits ein Konto?"
+        "already_have_account?": "Hast du bereits ein Konto?",
+        "tos": "Ich stimme den <a href=\"\/docs\/tos\" class=\"underline\">Nutzungsbedingungen<\/a> zu."
     },
     "login_page": {
         "welcome_back": "Willkommen zurück.",
