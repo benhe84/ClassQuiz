@@ -1,9 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { getLocalization } from '$lib/i18n';
@@ -17,42 +15,51 @@ SPDX-License-Identifier: MPL-2.0
 	let { data }: Props = $props();
 </script>
 
-<div class="w-full">
-	<div class="flex justify-center w-full">
-		<div class="w-11/12 m-auto">
-			{#if data.results.length === 0}
-				<p class="text-center text-3xl mt-8">{$t('results_page.no_results_so_far')}</p>
-			{:else}
-				<table class="w-full">
+<div class="min-h-screen w-full bg-base px-4 py-12">
+	<div class="mx-auto w-full max-w-4xl">
+		<h1 class="mb-6 text-3xl font-bold text-base">{$t('results_page.title')}</h1>
+
+		{#if data.results.length === 0}
+			<div class="card text-center">
+				<p class="text-lg text-muted">{$t('results_page.no_results_so_far')}</p>
+			</div>
+		{:else}
+			<div class="card overflow-hidden p-0">
+				<table class="w-full text-left">
 					<thead>
-						<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('results_page.quiz_title')}
+						<tr class="border-b border-base">
+							<th class="p-4 text-xs font-semibold uppercase tracking-wider text-muted">
+								{$t('results_page.quiz_title')}
 							</th>
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('results_page.date_played')}
+							<th class="p-4 text-xs font-semibold uppercase tracking-wider text-muted">
+								{$t('results_page.date_played')}
 							</th>
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('results_page.player_count')}
+							<th class="p-4 text-xs font-semibold uppercase tracking-wider text-muted">
+								{$t('results_page.player_count')}
 							</th>
-							<th class="mx-auto p-1">{$t('words.note')}</th>
+							<th class="p-4 text-xs font-semibold uppercase tracking-wider text-muted">
+								{$t('words.note')}
+							</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.results as result}
-							<tr class="text-left">
-								<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-									><a href="/results/{result.id}" class="underline text-lg"
-										>{@html result.title}</a
-									></td
-								>
-								<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-									>{new Date(result.timestamp).toLocaleString()}</td
-								>
-								<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-									>{Object.keys(result.player_scores).length}</td
-								>
-								<td class:p-1={result.note}>
+							<tr class="border-b border-base transition hover:bg-surface-2">
+								<td class="p-4">
+									
+										href="/results/{result.id}"
+										class="font-medium text-primary underline-offset-2 hover:underline"
+									>
+										{@html result.title}
+									</a>
+								</td>
+								<td class="p-4 text-sm text-secondary">
+									{new Date(result.timestamp).toLocaleString()}
+								</td>
+								<td class="p-4 text-sm text-secondary">
+									{Object.keys(result.player_scores).length}
+								</td>
+								<td class="p-4 text-sm text-secondary">
 									{#if result.note}
 										{result.note}
 									{/if}
@@ -61,7 +68,7 @@ SPDX-License-Identifier: MPL-2.0
 						{/each}
 					</tbody>
 				</table>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 </div>
