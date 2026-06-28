@@ -144,7 +144,7 @@ SPDX-License-Identifier: MPL-2.0
 				{/if}
 
 				
-					href="/practice?quiz_id={quiz.id}"
+				<a	href="/practice?quiz_id={quiz.id}"
 					class="rounded-xl border border-base bg-surface-2 px-4 py-2 text-sm font-medium text-base hover:bg-surface transition"
 				>
 					{$t('words.practice')}
