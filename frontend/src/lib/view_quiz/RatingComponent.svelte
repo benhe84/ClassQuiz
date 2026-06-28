@@ -1,12 +1,10 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-SPDX-License-Identifier: MPL-2.0
--->
-
 <script lang="ts">
 	import type { QuizData } from '$lib/quiz_types';
 	import Hoverable from '$lib/view_quiz/Hoverable.svelte';
 	import { createTippy } from 'svelte-tippy';
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
 
 	interface Props {
 		quiz: QuizData;
@@ -27,9 +25,7 @@ SPDX-License-Identifier: MPL-2.0
 	const complete_action = async (positive: boolean) => {
 		const res = await fetch(`/api/v1/community/rate/${quiz.id}`, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ type: positive ? 'LIKE' : 'DISLIKE' })
 		});
 		if (res.status === 409) {
@@ -53,27 +49,16 @@ SPDX-License-Identifier: MPL-2.0
 			<button
 				class="flex h-9 w-9 items-center justify-center rounded-full transition"
 				style="background-color: color-mix(in srgb, var(--success) 18%, transparent);"
-				use:tippy={{ content: 'Like this quiz!' }}
+				use:tippy={{ content: $t('view_quiz_page.tooltips.like') }}
 				class:opacity-40={FeedBackButtonsHovered.dislike}
 				onclick={() => complete_action(true)}
 			>
-				<svg
-					class="h-5 w-5"
-					style="color: var(--success);"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-					/>
+				<svg class="h-5 w-5" style="color: var(--success);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
 				</svg>
 			</button>
 		</Hoverable>
-		<span class="text-sm font-medium text-base">{quiz.likes}</span>
+		<span class="text-sm font-medium" style="color:var(--text-primary);">{quiz.likes}</span>
 	</div>
 
 	<div class="flex items-center gap-1">
@@ -81,45 +66,34 @@ SPDX-License-Identifier: MPL-2.0
 			<button
 				class="flex h-9 w-9 items-center justify-center rounded-full transition"
 				style="background-color: color-mix(in srgb, var(--danger) 18%, transparent);"
-				use:tippy={{ content: 'Dislike this quiz!' }}
+				use:tippy={{ content: $t('view_quiz_page.tooltips.dislike') }}
 				class:opacity-40={FeedBackButtonsHovered.like}
 				onclick={() => complete_action(false)}
 			>
-				<svg
-					class="h-5 w-5"
-					style="color: var(--danger);"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"
-					/>
+				<svg class="h-5 w-5" style="color: var(--danger);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
 				</svg>
 			</button>
 		</Hoverable>
-		<span class="text-sm font-medium text-base">{quiz.dislikes}</span>
+		<span class="text-sm font-medium" style="color:var(--text-primary);">{quiz.dislikes}</span>
 	</div>
 
-	<div class="h-6 w-px bg-base"></div>
+	<div class="h-6 w-px" style="background-color:var(--border);"></div>
 
-	<div class="flex items-center gap-1.5" use:tippy={{ content: 'How often the quiz was started' }}>
-		<svg class="h-5 w-5 text-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+	<div class="flex items-center gap-1.5" use:tippy={{ content: $t('view_quiz_page.tooltips.plays') }}>
+		<svg class="h-5 w-5" style="color:var(--text-secondary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 			<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" stroke-linecap="round" stroke-linejoin="round" />
 			<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" />
 		</svg>
-		<span class="text-sm font-medium text-muted">{quiz.plays}</span>
+		<span class="text-sm font-medium" style="color:var(--text-secondary);">{quiz.plays}</span>
 	</div>
 
-	<div class="flex items-center gap-1.5" use:tippy={{ content: 'Quiz views' }}>
-		<svg class="h-5 w-5 text-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+	<div class="flex items-center gap-1.5" use:tippy={{ content: $t('view_quiz_page.tooltips.views') }}>
+		<svg class="h-5 w-5" style="color:var(--text-secondary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 			<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" />
 			<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" />
 		</svg>
-		<span class="text-sm font-medium text-muted">{quiz.views}</span>
+		<span class="text-sm font-medium" style="color:var(--text-secondary);">{quiz.views}</span>
 	</div>
 
 </div>
