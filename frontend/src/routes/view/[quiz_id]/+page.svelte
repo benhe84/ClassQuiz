@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
 <script lang="ts">
 	import DownloadQuiz from '$lib/components/DownloadQuiz.svelte';
 	import { getLocalization } from '$lib/i18n';
@@ -49,10 +55,8 @@
 
 <!-- HEADER GRID -->
 <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-
 	<!-- LEFT: QUIZ INFO (BREIT) -->
 	<div class="lg:col-span-2 rounded-2xl border border-base bg-surface p-6 shadow-sm">
-
 		<h1 class="text-3xl font-bold text-center">
 			{@html quiz.title}
 		</h1>
@@ -84,12 +88,10 @@
 				<ModComponent quiz_id={quiz.id} />
 			{/if}
 		</div>
-
 	</div>
 
 	<!-- RIGHT: ACTIONS -->
 	<div class="rounded-2xl border border-base bg-surface p-6 shadow-sm flex flex-col gap-3">
-
 		<!-- START -->
 		{#if logged_in}
 			<GrayButton onclick={() => (start_game = quiz.id)}>
@@ -133,24 +135,19 @@
 		>
 			⚠ {$t('tooltips.report')}
 		</a>
-
 	</div>
 	<!-- QUESTIONS (KAHOOT STYLE LIST) -->
 	<section class="card">
 		<h2 class="mb-4 text-lg font-bold text-base">Fragen</h2>
 
 		<div class="flex flex-col gap-3">
-
 			{#each quiz.questions as question, i}
-
 				<div class="overflow-hidden rounded-xl border border-base">
-
 					<button
 						type="button"
 						class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"
-						onclick={() => open_question = open_question === i ? null : i}
+						onclick={() => (open_question = open_question === i ? null : i)}
 					>
-
 						<span class="flex-1 font-medium">
 							<span class="text-muted mr-2">{i + 1}.</span>
 							{@html question.question}
@@ -172,14 +169,16 @@
 							stroke-width="2"
 							viewBox="0 0 24 24"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
-
 					</button>
 
 					{#if open_question === i}
 						<div class="bg-surface-2 p-4">
-
 							{#if question.image}
 								<div class="flex justify-center mb-3">
 									<MediaComponent src={question.image} muted={true} />
@@ -221,18 +220,13 @@
 									Preview nicht relevant für diesen Typ
 								</div>
 							{/if}
-
 						</div>
 					{/if}
-
 				</div>
-
 			{/each}
-
 		</div>
 	</section>
 </div>
-	
 
 {#if start_game !== null}
 	<StartGamePopup bind:quiz_id={start_game} />
