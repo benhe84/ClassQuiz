@@ -369,8 +369,14 @@
         "date_played": "Datum",
         "player_count": "Teilnehmende",
         "no_results_so_far": "Noch keine Ergebnisse gespeichert...",
+        "title": "Ergebnisse",
         "general_overview": {
-            "sentence": "Das Quiz {{title}}, gestartet am {{date}}, hatte {{player_count}} Teilnehmende mit einer durchschnittlichen Punktzahl von {{average_score}}."
+            "sentence": "Das Quiz {{title}}, gestartet am {{date}}, hatte {{player_count}} Teilnehmende mit einer durchschnittlichen Punktzahl von {{average_score}}.",
+            "players": "Teilnehmende",
+            "average_score": "Durchschnitt",
+            "highest_score": "Höchste Punktzahl",
+            "lowest_score": "Niedrigste Punktzahl",
+            "all_players": "Alle Teilnehmenden"
         }
     },
     "result_page": {
