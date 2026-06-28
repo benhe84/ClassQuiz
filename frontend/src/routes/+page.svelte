@@ -16,7 +16,7 @@ SPDX-License-Identifier: MPL-2.0
 	import SelectScreenshot from '$lib/assets/landing_new/select.webp';
 	import ResultScreenshot from '$lib/assets/landing_new/result.webp';
 	import WinnersScreenshot from '$lib/assets/landing_new/winners.webp';
-	
+
 	const { t } = getLocalization();
 	navbarVisible.visible = true;
 
@@ -33,6 +33,7 @@ SPDX-License-Identifier: MPL-2.0
 
 	let selected_create_thing = $state(SelectedCreateThing.Create);
 	let selected_play_thing = $state(SelectedPlayThing.Select);
+	let selected_section = $state(0);
 
 	const classquiz_reasons = [
 		{
