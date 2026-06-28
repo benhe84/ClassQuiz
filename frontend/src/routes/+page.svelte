@@ -8,7 +8,6 @@ SPDX-License-Identifier: MPL-2.0
 	import { getLocalization } from '$lib/i18n';
 	import WebPOpenGraph from '$lib/assets/landing/opengraph-home.webp';
 	import JpgOpenGraph from '$lib/assets/landing/opengraph-home.jpg';
-	import Newsletter from '$lib/landing/newsletter.svelte';
 	import { fade } from 'svelte/transition';
 
 	import FindScreenshot from '$lib/assets/landing_new/find.webp';
@@ -102,63 +101,59 @@ SPDX-License-Identifier: MPL-2.0
 	<meta name="twitter:image" content={WebPOpenGraph} />
 </svelte:head>
 
-<div class="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
+<div class="min-h-screen">
 
 	<!-- Hero -->
 	<section class="flex flex-col items-center justify-center px-4 py-24 text-center">
-		<div class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6366F1]/30 bg-[#6366F1]/10 px-4 py-1.5 text-sm font-medium text-[#6366F1]">
-			<span class="h-2 w-2 rounded-full bg-[#6366F1] animate-pulse"></span>
+		<div class="hero-badge">
+			<span class="hero-badge-dot"></span>
 			Open Source · Kostenlos · Ohne Tracking
 		</div>
-		<h1 class="mt-6 text-6xl font-bold sm:text-8xl marck-script text-[#F8FAFC]">ClassQuiz</h1>
-		<p class="mt-4 max-w-xl text-lg text-[#94A3B8]">{$t('index_page.slogan')}</p>
+		<h1 class="mt-6 text-6xl font-bold sm:text-8xl marck-script">ClassQuiz</h1>
+		<p class="mt-4 max-w-xl text-lg" style="color:var(--text-secondary);">{$t('index_page.slogan')}</p>
 		<div class="mt-8 flex gap-4">
-			<a href="/account/login" class="rounded-xl bg-[#6366F1] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#5558E3]">
+			<a href="/account/login" class="btn btn-primary px-6 py-3 text-base rounded-xl">
 				Jetzt starten
 			</a>
-			<a href="/explore" class="rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-[#F8FAFC] transition hover:bg-white/10">
+			<a href="/explore" class="btn-outline px-6 py-3 text-base rounded-xl">
 				Quiz erkunden
 			</a>
 		</div>
 	</section>
 
-	<!-- Wie funktioniert ClassQuiz: Erstellen -->
+	<!-- Erstellen -->
 	<section class="px-4 pb-20 lg:px-12">
 		<div class="mb-6 text-center">
-			<h2 class="text-3xl font-bold text-[#F8FAFC]">{$t('index_page.how_does_classquiz_work')}</h2>
-			<p class="mt-2 text-sm text-[#475569]">{$t('index_page.get_a_quiz')}</p>
+			<h2 class="text-3xl font-bold">{$t('index_page.how_does_classquiz_work')}</h2>
+			<p class="mt-2 text-sm" style="color:var(--text-secondary);">{$t('index_page.get_a_quiz')}</p>
 		</div>
-
-		<div class="mx-auto max-w-5xl rounded-2xl border border-white/10 bg-[#1E293B] shadow-2xl overflow-hidden">
+		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
-				<!-- Screenshot -->
-				<div class="p-4 flex items-center justify-center bg-[#0F172A]">
+				<div class="feature-screenshot">
 					{#if selected_create_thing === SelectedCreateThing.Create}
-						<img class="rounded-xl shadow-xl w-full" src={EditScreenshot} in:fade|global alt="Quiz erstellen" />
+						<img class="feature-img" src={EditScreenshot} in:fade|global alt="Quiz erstellen" />
 					{:else if selected_create_thing === SelectedCreateThing.Find}
-						<img class="rounded-xl shadow-xl w-full" src={FindScreenshot} in:fade|global alt="Quiz finden" />
+						<img class="feature-img" src={FindScreenshot} in:fade|global alt="Quiz finden" />
 					{:else}
-						<img class="rounded-xl shadow-xl w-full" src={ImportScreenshot} in:fade|global alt="Quiz importieren" />
+						<img class="feature-img" src={ImportScreenshot} in:fade|global alt="Quiz importieren" />
 					{/if}
 				</div>
-
-				<!-- Optionen -->
-				<div class="flex flex-col gap-3 p-6 border-t border-white/10 lg:border-t-0 lg:border-l">
+				<div class="feature-options">
 					{#each create_options as opt}
 						<button
 							type="button"
 							onclick={() => { selected_create_thing = opt.key; }}
-							class="flex items-start gap-4 rounded-xl p-4 text-left transition"
-							style="background-color:{selected_create_thing === opt.key ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)'}; border:1px solid {selected_create_thing === opt.key ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}"
+							class="feature-option"
+							class:feature-option-active={selected_create_thing === opt.key}
 						>
-							<div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#6366F1]/20">
-								<svg class="h-5 w-5 text-[#6366F1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<div class="feature-option-icon">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
 								</svg>
 							</div>
 							<div>
-								<p class="font-semibold text-[#F8FAFC]">{opt.label}</p>
-								<p class="mt-0.5 text-sm text-[#94A3B8]">{opt.desc}</p>
+								<p class="font-semibold">{opt.label}</p>
+								<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
 							</div>
 						</button>
 					{/each}
@@ -170,37 +165,35 @@ SPDX-License-Identifier: MPL-2.0
 	<!-- Spielen -->
 	<section class="px-4 pb-20 lg:px-12">
 		<div class="mb-6 text-center">
-			<h2 class="text-3xl font-bold text-[#F8FAFC]">{$t('index_page.play_quiz')}</h2>
+			<h2 class="text-3xl font-bold">{$t('index_page.play_quiz')}</h2>
 		</div>
-
-		<div class="mx-auto max-w-5xl rounded-2xl border border-white/10 bg-[#1E293B] shadow-2xl overflow-hidden">
+		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
-				<div class="p-4 flex items-center justify-center bg-[#0F172A]">
+				<div class="feature-screenshot">
 					{#if selected_play_thing === SelectedPlayThing.Select}
-						<img class="rounded-xl shadow-xl w-full" src={SelectScreenshot} in:fade|global alt="Antwort auswählen" />
+						<img class="feature-img" src={SelectScreenshot} in:fade|global alt="Antwort auswählen" />
 					{:else if selected_play_thing === SelectedPlayThing.Results}
-						<img class="rounded-xl shadow-xl w-full" src={ResultScreenshot} in:fade|global alt="Ergebnisse" />
+						<img class="feature-img" src={ResultScreenshot} in:fade|global alt="Ergebnisse" />
 					{:else}
-						<img class="rounded-xl shadow-xl w-full" src={WinnersScreenshot} in:fade|global alt="Gewinner" />
+						<img class="feature-img" src={WinnersScreenshot} in:fade|global alt="Gewinner" />
 					{/if}
 				</div>
-
-				<div class="flex flex-col gap-3 p-6 border-t border-white/10 lg:border-t-0 lg:border-l">
+				<div class="feature-options">
 					{#each play_options as opt}
 						<button
 							type="button"
 							onclick={() => { selected_play_thing = opt.key; }}
-							class="flex items-start gap-4 rounded-xl p-4 text-left transition"
-							style="background-color:{selected_play_thing === opt.key ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)'}; border:1px solid {selected_play_thing === opt.key ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}"
+							class="feature-option"
+							class:feature-option-active={selected_play_thing === opt.key}
 						>
-							<div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#6366F1]/20">
-								<svg class="h-5 w-5 text-[#6366F1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<div class="feature-option-icon">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
 								</svg>
 							</div>
 							<div>
-								<p class="font-semibold text-[#F8FAFC]">{opt.label}</p>
-								<p class="mt-0.5 text-sm text-[#94A3B8]">{opt.desc}</p>
+								<p class="font-semibold">{opt.label}</p>
+								<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
 							</div>
 						</button>
 					{/each}
@@ -212,28 +205,24 @@ SPDX-License-Identifier: MPL-2.0
 	<!-- Warum ClassQuiz -->
 	<section class="px-4 pb-24 lg:px-12">
 		<div class="mb-6 text-center">
-			<h2 class="text-3xl font-bold text-[#F8FAFC]">{$t('index_page.why_classquiz')}</h2>
+			<h2 class="text-3xl font-bold">{$t('index_page.why_classquiz')}</h2>
 		</div>
-
-		<div class="mx-auto max-w-5xl rounded-2xl border border-white/10 bg-[#1E293B] shadow-2xl overflow-hidden">
+		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
-				<!-- Inhalt -->
 				<div class="flex items-center justify-center p-10">
-					<p class="text-lg leading-relaxed text-[#94A3B8]">
+					<p class="text-lg leading-relaxed" style="color:var(--text-secondary);">
 						{classquiz_reasons[selected_classquiz_reason].content}
 					</p>
 				</div>
-
-				<!-- Gründe -->
-				<div class="flex flex-col gap-2 overflow-y-auto p-4 border-t border-white/10 lg:border-t-0 lg:border-l max-h-96 lg:max-h-none why-classquiz">
+				<div class="feature-options why-classquiz max-h-96 overflow-y-auto lg:max-h-none border-t lg:border-t-0 lg:border-l" style="border-color:var(--border);">
 					{#each classquiz_reasons as reason, index}
 						<button
 							type="button"
 							onclick={() => { selected_classquiz_reason = index; }}
-							class="rounded-xl px-4 py-3 text-left text-sm font-medium transition"
-							style="background-color:{selected_classquiz_reason === index ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)'}; color:{selected_classquiz_reason === index ? '#F8FAFC' : '#94A3B8'}; border:1px solid {selected_classquiz_reason === index ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.05)'}"
+							class="feature-option"
+							class:feature-option-active={selected_classquiz_reason === index}
 						>
-							{reason.headline}
+							<p class="font-medium">{reason.headline}</p>
 						</button>
 					{/each}
 				</div>
@@ -243,8 +232,104 @@ SPDX-License-Identifier: MPL-2.0
 </div>
 
 <style>
+	.hero-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: 9999px;
+		border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+		background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+		padding: 0.375rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--primary);
+	}
+	.hero-badge-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 9999px;
+		background-color: var(--primary);
+		animation: pulse 2s infinite;
+	}
+	.btn-outline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		border: 1px solid var(--border);
+		background-color: transparent;
+		color: var(--text-primary);
+		transition: all 0.15s;
+		cursor: pointer;
+	}
+	.btn-outline:hover {
+		background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
+	}
+	.feature-card {
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 1rem;
+		overflow: hidden;
+		box-shadow: 0 4px 24px var(--shadow);
+	}
+	.feature-screenshot {
+		padding: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--bg);
+	}
+	.feature-img {
+		border-radius: 0.75rem;
+		box-shadow: 0 4px 16px var(--shadow);
+		width: 100%;
+	}
+	.feature-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1.5rem;
+		border-left: 1px solid var(--border);
+	}
+	.feature-option {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		border-radius: 0.75rem;
+		padding: 1rem;
+		text-align: left;
+		transition: all 0.15s;
+		border: 1px solid transparent;
+		background-color: color-mix(in srgb, var(--text-primary) 3%, transparent);
+		color: var(--text-primary);
+		cursor: pointer;
+	}
+	.feature-option:hover {
+		background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+	}
+	.feature-option-active {
+		background-color: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+		border-color: color-mix(in srgb, var(--primary) 40%, transparent) !important;
+	}
+	.feature-option-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 0.5rem;
+		background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+		color: var(--primary);
+		flex-shrink: 0;
+		margin-top: 0.125rem;
+	}
 	.why-classquiz::-webkit-scrollbar { width: 0.4rem; }
 	.why-classquiz::-webkit-scrollbar-track { background: transparent; }
-	.why-classquiz::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 9999px; }
-	.why-classquiz::-webkit-scrollbar-thumb:hover { background-color: #475569; }
+	.why-classquiz::-webkit-scrollbar-thumb {
+		background-color: var(--border);
+		border-radius: 9999px;
+	}
+	.why-classquiz::-webkit-scrollbar-thumb:hover {
+		background-color: var(--text-secondary);
+	}
 </style>
