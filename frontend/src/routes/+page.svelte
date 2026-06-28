@@ -112,7 +112,7 @@ SPDX-License-Identifier: MPL-2.0
 		<h1 class="mt-6 text-6xl font-bold sm:text-8xl marck-script">ClassQuiz</h1>
 		<p class="mt-4 max-w-xl text-lg" style="color:var(--text-secondary);">{$t('index_page.slogan')}</p>
 		<div class="mt-8 flex gap-4">
-			<a href="/account/login" class="btn btn-primary px-6 py-3 text-base rounded-xl">
+			<a href="/account/login" class="btn btn-primary px-6 py-3 rounded-xl">
 				Jetzt starten
 			</a>
 			<a href="/explore" class="btn-outline px-6 py-3 text-base rounded-xl">
@@ -125,7 +125,7 @@ SPDX-License-Identifier: MPL-2.0
 	<section class="px-4 pb-20 lg:px-12">
 		<div class="mb-6 text-center">
 			<h2 class="text-3xl font-bold">{$t('index_page.how_does_classquiz_work')}</h2>
-			<p class="mt-2 text-sm" style="color:var(--text-secondary);">{$t('index_page.get_a_quiz')}</p>
+			<h3 class="mt-2 text-sm" style="color:var(--text-secondary);">{$t('index_page.get_a_quiz')}</h3>
 		</div>
 		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
@@ -165,7 +165,7 @@ SPDX-License-Identifier: MPL-2.0
 	<!-- Spielen -->
 	<section class="px-4 pb-20 lg:px-12">
 		<div class="mb-6 text-center">
-			<h2 class="text-3xl font-bold">{$t('index_page.play_quiz')}</h2>
+			<h3 class="text-3xl font-bold">{$t('index_page.play_quiz')}</h3>
 		</div>
 		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
@@ -205,7 +205,7 @@ SPDX-License-Identifier: MPL-2.0
 	<!-- Warum ClassQuiz -->
 	<section class="px-4 pb-24 lg:px-12">
 		<div class="mb-6 text-center">
-			<h2 class="text-3xl font-bold">{$t('index_page.why_classquiz')}</h2>
+			<h3 class="text-3xl font-bold">{$t('index_page.why_classquiz')}</h3>
 		</div>
 		<div class="feature-card mx-auto max-w-5xl">
 			<div class="grid grid-cols-1 lg:grid-cols-2">
