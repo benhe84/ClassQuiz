@@ -1,323 +1,381 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-SPDX-License-Identifier: MPL-2.0
--->
-
 <script lang="ts">
-	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import DownloadQuiz from '$lib/components/DownloadQuiz.svelte';
 	import { getLocalization } from '$lib/i18n';
-	import WebPOpenGraph from '$lib/assets/landing/opengraph-home.webp';
-	import JpgOpenGraph from '$lib/assets/landing/opengraph-home.jpg';
+	import { createTippy } from 'svelte-tippy';
+	import ImportedOrNot from '$lib/view_quiz/imported_or_not.svelte';
+	import { QuizQuestionType } from '$lib/quiz_types.js';
+	import StartGamePopup from '$lib/dashboard/start_game.svelte';
+	import { onMount } from 'svelte';
+	import Spinner from '$lib/Spinner.svelte';
+	import MediaComponent from '$lib/editor/MediaComponent.svelte';
+	import RatingComponent from '$lib/view_quiz/RatingComponent.svelte';
+	import { page } from '$app/state';
+	import ModComponent from './ModComponent.svelte';
+	import { get_foreground_color } from '$lib/helpers.ts';
 	import { fade } from 'svelte/transition';
 
-	import FindScreenshot from '$lib/assets/landing_new/find.webp';
-	import ImportScreenshot from '$lib/assets/landing_new/import.webp';
-	import EditScreenshot from '$lib/assets/landing_new/edit.webp';
-	import SelectScreenshot from '$lib/assets/landing_new/select.webp';
-	import ResultScreenshot from '$lib/assets/landing_new/result.webp';
-	import WinnersScreenshot from '$lib/assets/landing_new/winners.webp';
-	import { onMount } from 'svelte';
+	const default_colors = ['#6366F1', '#EC4899', '#F59E0B', '#10B981'];
 
-	const { t } = getLocalization();
-	navbarVisible.visible = true;
-
-	let newsletterModalOpen: boolean = $state();
-	onMount(() => {
-		const ls = localStorage.getItem('newsletter');
-		newsletterModalOpen = ls === null;
+	const tippy = createTippy({
+		arrow: true,
+		animation: 'perspective-subtle',
+		placement: 'top'
 	});
 
-	enum SelectedCreateThing { Create, Find, Import }
-	enum SelectedPlayThing { Select, Results, Winners }
+	let start_game = $state(null);
+	let download_id: string | null = $state(null);
+	let open_question: number | null = $state(null);
 
-	let selected_section = $state(-1);
-	let selected_create_thing = $state(SelectedCreateThing.Create);
-	let selected_play_thing = $state(SelectedPlayThing.Select);
-	let selected_classquiz_reason = $state(0);
+	const urlparams = page.url.searchParams;
+	const mod_view = Boolean(urlparams.get('mod'));
+	const auto_expand = Boolean(urlparams.get('autoExpand'));
 
-	const classquiz_reasons = [
-		{ headline: $t('index_page.no_player_limit'), content: $t('index_page.no_player_limit_content') },
-		{ headline: $t('index_page.no_tracking'), content: $t('index_page.no_tracking_content') },
-		{ headline: $t('index_page.self_hostable'), content: $t('index_page.self_hostable_content') },
-		{ headline: $t('index_page.german_server'), content: $t('index_page.german_server_content') },
-		{ headline: $t('index_page.user_friendly'), content: $t('index_page.user_friendly_content') },
-		{ headline: $t('index_page.completely_free'), content: $t('index_page.completely_free_content') },
-		{ headline: $t('index_page.quiz_results_downloadable'), content: $t('index_page.quiz_results_downloadable_content') },
-		{ headline: $t('index_page.multilingual'), content: $t('index_page.multilingual_content') },
-		{ headline: $t('index_page.dark_mode'), content: $t('index_page.dark_mode_content') },
-		{ headline: $t('index_page.download_quizzes'), content: $t('index_page.download_quizzes_content') },
-		{ headline: $t('index_page.community_driven'), content: $t('index_page.community_driven_content') }
-	];
+	onMount(() => {
+		document.body.addEventListener('keydown', (e) => {
+			if (e.code === 'Escape') open_question = null;
+		});
+		if (auto_expand && quiz.questions.length > 0) open_question = 0;
+	});
 
-	const create_options = [
-		{
-			key: SelectedCreateThing.Create,
-			icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',
-			label: $t('words.create'),
-			desc: $t('index_page.create_a_quiz_from_scratch')
-		},
-		{
-			key: SelectedCreateThing.Find,
-			icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
-			label: $t('words.find'),
-			desc: $t('index_page.find_or_explore')
-		}
-	];
+	const { t } = getLocalization();
+	let { data } = $props();
+	let { quiz, logged_in } = $state(data);
 
-	const play_options = [
-		{
-			key: SelectedPlayThing.Select,
-			icon: 'M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122',
-			label: $t('index_page.select_answer'),
-			desc: $t('index_page.choose_answer_wisely')
-		},
-		{
-			key: SelectedPlayThing.Results,
-			icon: 'M4 6h16M4 10h16M4 14h16M4 18h16',
-			label: $t('index_page.view_results'),
-			desc: $t('index_page.check_if_chosen_wisely')
-		},
-		{
-			key: SelectedPlayThing.Winners,
-			icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
-			label: $t('index_page.list_winners'),
-			desc: $t('index_page.get_ranking_and_winners')
-		}
-	];
+	const type_labels: Record<string, string> = {
+		ABCD: 'Multiple Choice',
+		CHECK: 'Multiple Select',
+		VOTING: 'Abstimmung',
+		TEXT: 'Freitext',
+		RANGE: 'Bereich',
+		ORDER: 'Reihenfolge',
+		SLIDE: 'Folie'
+	};
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - {$t('index_page.meta.title')}</title>
-	<meta name="description" content={$t('index_page.meta.description')} />
-	<meta property="og:url" content="https://classquiz.de/" />
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta property="og:description" content="ClassQuiz is a quiz-application like KAHOOT!, but open-source." />
-	<meta property="og:image" content={JpgOpenGraph} />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content="classquiz.de" />
-	<meta property="twitter:url" content="https://classquiz.de/" />
-	<meta name="twitter:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta name="twitter:description" content="ClassQuiz is a quiz-application like KAHOOT!, but open-source." />
-	<meta name="twitter:image" content={WebPOpenGraph} />
+	<title>ClassQuiz - {quiz.title}</title>
 </svelte:head>
 
-<div class="min-h-screen">
+<div class="view-page">
+	<div class="view-inner">
 
-	<!-- Hero -->
-	<section class="flex flex-col items-center justify-center px-4 py-24 text-center">
-		<div class="hero-badge">
-			<span class="hero-badge-dot"></span>
-			Open Source · Kostenlos · Ohne Tracking
-		</div>
-		<h1 class="mt-6 text-6xl font-bold sm:text-8xl marck-script"style="color:var(--text-primary);">ClassQuiz</h1>
-		<p class="mt-4 max-w-xl text-lg" style="color:var(--text-secondary);">{$t('index_page.slogan')}</p>
-		<div class="mt-8 flex gap-4">
-			<a href="/account/login" class="btn btn-primary px-6 py-3 text-base rounded-xl">
-				Jetzt starten
-			</a>
-			<a href="/explore" class="btn-outline px-6 py-3 text-base rounded-xl">
-				Quiz erkunden
-			</a>
-		</div>
-	</section>
+		<!-- Header -->
+		<div class="card view-header">
+			{#if quiz.cover_image}
+				<div class="flex justify-center mb-5">
+					<img
+						src="/api/v1/storage/download/{quiz.cover_image}"
+						alt="Cover"
+						class="max-h-48 w-auto rounded-2xl border object-contain shadow-lg"
+						style="border-color:var(--border);"
+					/>
+				</div>
+			{/if}
 
-	<!-- Accordion -->
-	<section class="px-4 pb-24 lg:px-12">
-		<div class="mx-auto max-w-3xl flex flex-col gap-3">
+			<h1 class="view-title">{@html quiz.title}</h1>
 
-			<!-- 1. Ein Quiz holen -->
-			<div class="card" style="padding:0; overflow:hidden;">
-				<button
-					type="button"
-					onclick={() => { selected_section = selected_section === 0 ? -1 : 0; }}
-					class="accordion-header"
-					aria-expanded={selected_section === 0}
-				>
-					<div class="flex items-center gap-3">
-						<span class="accordion-number">1</span>
-						<span class="font-semibold text-lg">{$t('index_page.get_a_quiz')}</span>
+			{#if quiz.description}
+				<p class="view-desc">{@html quiz.description}</p>
+			{/if}
+
+			<p class="view-author">
+				{$t('view_quiz_page.made_by')}
+				<a href="/user/{quiz.user_id.id}" class="view-author-link">
+					@{quiz.user_id.username}
+				</a>
+			</p>
+
+			<div class="flex justify-center mt-3">
+				<ImportedOrNot imported={quiz.imported_from_kahoot} />
+			</div>
+
+			<div class="flex justify-center gap-3 flex-wrap mt-4">
+				<RatingComponent bind:quiz />
+				{#if mod_view}
+					<ModComponent quiz_id={quiz.id} />
+				{/if}
+			</div>
+
+			<!-- Aktionen -->
+			<div class="view-actions">
+				<!-- Spiel starten -->
+				{#if logged_in}
+					<button
+						onclick={() => (start_game = quiz.id)}
+						class="view-btn view-btn-primary"
+					>
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+							<path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						{$t('words.start') ?? 'Starten'}
+					</button>
+				{:else}
+					<div use:tippy={{ content: $t('view_quiz_page.tooltips.start_game') }}>
+						<button disabled class="view-btn view-btn-primary" style="opacity:0.4;cursor:not-allowed;">
+							<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							Starten
+						</button>
 					</div>
-					<svg class="accordion-chevron" class:accordion-chevron-open={selected_section === 0} fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+				{/if}
+
+				<!-- Üben -->
+				<a href="/practice?quiz_id={quiz.id}" class="view-btn view-btn-secondary">
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 					</svg>
-				</button>
-				{#if selected_section === 0}
-					<div class="accordion-body" transition:fade|global={{ duration: 150 }}>
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-							<div class="accordion-screenshot">
-								{#if selected_create_thing === SelectedCreateThing.Create}
-									<img class="feature-img" src={EditScreenshot} in:fade|global alt="Quiz erstellen" />
-								{:else if selected_create_thing === SelectedCreateThing.Find}
-									<img class="feature-img" src={FindScreenshot} in:fade|global alt="Quiz finden" />
-								{:else}
-									<img class="feature-img" src={ImportScreenshot} in:fade|global alt="Quiz importieren" />
+					{$t('words.practice')}
+				</a>
+
+				<!-- Download -->
+				{#if logged_in}
+					<button onclick={() => (download_id = quiz.id)} class="view-btn view-btn-secondary">
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						</svg>
+						{$t('words.download')}
+					</button>
+				{/if}
+
+				<!-- Kahoot -->
+				{#if quiz.imported_from_kahoot && quiz.kahoot_id}
+					
+					<a	href="https://create.kahoot.it/details/{quiz.kahoot_id}"
+						target="_blank"
+						class="view-btn view-btn-secondary"
+					>
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+						</svg>
+						{$t('view_quiz_page.view_on_kahoot')}
+					</a>
+				{/if}
+			</div>
+
+			<div class="flex justify-center mt-4">
+				
+				<a	href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
+					class="text-xs underline"
+					style="color:var(--text-secondary);"
+				>
+					{$t('words.report')}
+				</a>
+			</div>
+		</div>
+
+		<!-- Fragen -->
+		<div class="card">
+			<div class="flex items-center justify-between mb-5">
+				<h2 class="text-lg font-bold" style="color:var(--text-primary);">Fragen</h2>
+				<span class="questions-count">{quiz.questions.length}</span>
+			</div>
+
+			<div class="flex flex-col gap-2">
+				{#each quiz.questions as question, i}
+					<div class="question-item">
+
+						<!-- Frage-Header -->
+						<button
+							type="button"
+							class="question-header"
+							onclick={() => open_question = open_question === i ? null : i}
+						>
+							<span class="question-number">{i + 1}</span>
+
+							<span class="question-text">
+								{@html question.question}
+							</span>
+
+							<div class="question-meta">
+								<span class="meta-badge">
+									<svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+									{question.time}s
+								</span>
+								<span class="meta-badge">
+									{type_labels[String(question.type)] ?? question.type}
+								</span>
+							</div>
+
+							<svg
+								class="question-chevron"
+								style="transform:rotate({open_question === i ? 180 : 0}deg)"
+								fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+							>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+							</svg>
+						</button>
+
+						<!-- Antworten -->
+						{#if open_question === i}
+							<div class="question-body" transition:fade={{ duration: 120 }}>
+
+								{#if question.image}
+									<div class="flex justify-center mb-4">
+										<MediaComponent
+											src={question.image}
+											muted={true}
+											css_classes="max-h-48 rounded-xl object-contain"
+										/>
+									</div>
 								{/if}
-							</div>
-							<div class="flex flex-col gap-3">
-								{#each create_options as opt}
-									<button
-										type="button"
-										onclick={() => { selected_create_thing = opt.key; }}
-										class="feature-option"
-										class:feature-option-active={selected_create_thing === opt.key}
-									>
-										<div class="feature-option-icon">
-											<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
-											</svg>
-										</div>
-										<div>
-											<p class="font-semibold">{opt.label}</p>
-											<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
-										</div>
-									</button>
-								{/each}
-							</div>
-						</div>
-					</div>
-				{/if}
-			</div>
 
-			<!-- 2. Das Quiz spielen -->
-			<div class="card" style="padding:0; overflow:hidden;">
-				<button
-					type="button"
-					onclick={() => { selected_section = selected_section === 1 ? -1 : 1; }}
-					class="accordion-header"
-					aria-expanded={selected_section === 1}
-				>
-					<div class="flex items-center gap-3">
-						<span class="accordion-number">2</span>
-						<span class="font-semibold text-lg">{$t('index_page.play_quiz')}</span>
-					</div>
-					<svg class="accordion-chevron" class:accordion-chevron-open={selected_section === 1} fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-					</svg>
-				</button>
-				{#if selected_section === 1}
-					<div class="accordion-body" transition:fade|global={{ duration: 150 }}>
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-							<div class="accordion-screenshot">
-								{#if selected_play_thing === SelectedPlayThing.Select}
-									<img class="feature-img" src={SelectScreenshot} in:fade|global alt="Antwort auswählen" />
-								{:else if selected_play_thing === SelectedPlayThing.Results}
-									<img class="feature-img" src={ResultScreenshot} in:fade|global alt="Ergebnisse" />
-								{:else}
-									<img class="feature-img" src={WinnersScreenshot} in:fade|global alt="Gewinner" />
+								{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK || question.type === undefined}
+									<div class="grid grid-cols-2 gap-2">
+										{#each question.answers as a, idx}
+											<div
+												class="answer-tile"
+												style="background-color:{a.color ?? default_colors[idx % 4]}; color:{get_foreground_color(a.color ?? default_colors[idx % 4])};"
+											>
+												<span>{a.answer}</span>
+												{#if a.right && question.type !== QuizQuestionType.VOTING}
+													<span class="answer-correct">✓</span>
+												{/if}
+											</div>
+										{/each}
+									</div>
+
+								{:else if question.type === QuizQuestionType.RANGE}
+									<div class="range-info">
+										<p>Richtig: <strong>{question.answers.min_correct} – {question.answers.max_correct}</strong></p>
+										<p style="color:var(--text-secondary);">Bereich: {question.answers.min} – {question.answers.max}</p>
+									</div>
+
+								{:else if question.type === QuizQuestionType.ORDER}
+									<ul class="flex flex-col gap-2">
+										{#each question.answers as a, idx}
+											<li class="order-item">
+												<span class="order-number">{idx + 1}</span>
+												<span>{a.answer}</span>
+											</li>
+										{/each}
+									</ul>
+
+								{:else if question.type === QuizQuestionType.VOTING || question.type === QuizQuestionType.TEXT}
+									<div class="grid grid-cols-2 gap-2">
+										{#each question.answers as a, idx}
+											<div class="answer-tile-neutral">{a.answer}</div>
+										{/each}
+									</div>
+
+								{:else if question.type === QuizQuestionType.SLIDE}
+									{#await import('$lib/play/admin/slide.svelte')}
+										<Spinner my_20={false} />
+									{:then c}
+										<div class="max-h-64 overflow-hidden rounded-xl">
+											<c.default question={quiz.questions[i]} />
+										</div>
+									{/await}
 								{/if}
-							</div>
-							<div class="flex flex-col gap-3">
-								{#each play_options as opt}
-									<button
-										type="button"
-										onclick={() => { selected_play_thing = opt.key; }}
-										class="feature-option"
-										class:feature-option-active={selected_play_thing === opt.key}
-									>
-										<div class="feature-option-icon">
-											<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
-											</svg>
-										</div>
-										<div>
-											<p class="font-semibold">{opt.label}</p>
-											<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
-										</div>
-									</button>
-								{/each}
-							</div>
-						</div>
-					</div>
-				{/if}
-			</div>
 
-			<!-- 3. Warum ClassQuiz -->
-			<div class="card" style="padding:0; overflow:hidden;">
-				<button
-					type="button"
-					onclick={() => { selected_section = selected_section === 2 ? -1 : 2; }}
-					class="accordion-header"
-					aria-expanded={selected_section === 2}
-				>
-					<div class="flex items-center gap-3">
-						<span class="accordion-number">3</span>
-						<span class="font-semibold text-lg">{$t('index_page.why_classquiz')}</span>
-					</div>
-					<svg class="accordion-chevron" class:accordion-chevron-open={selected_section === 2} fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-					</svg>
-				</button>
-				{#if selected_section === 2}
-					<div class="accordion-body" transition:fade|global={{ duration: 150 }}>
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-							<div class="flex items-start p-4 rounded-xl" style="background-color:var(--bg);">
-								<p class="text-base leading-relaxed" style="color:var(--text-secondary);">
-									{classquiz_reasons[selected_classquiz_reason].content}
-								</p>
 							</div>
-							<div class="flex flex-col gap-2 why-classquiz overflow-y-auto max-h-64">
-								{#each classquiz_reasons as reason, index}
-									<button
-										type="button"
-										onclick={() => { selected_classquiz_reason = index; }}
-										class="feature-option"
-										class:feature-option-active={selected_classquiz_reason === index}
-									>
-										<p class="font-medium text-sm">{reason.headline}</p>
-									</button>
-								{/each}
-							</div>
-						</div>
+						{/if}
 					</div>
-				{/if}
+				{/each}
 			</div>
-
 		</div>
-	</section>
+	</div>
 </div>
 
+{#if start_game !== null}
+	<StartGamePopup bind:quiz_id={start_game} />
+{/if}
+<DownloadQuiz bind:quiz_id={download_id} />
+
 <style>
-	.hero-badge {
+	.view-page {
+		min-height: 100vh;
+		background-color: var(--bg);
+		padding: 2rem 1rem;
+	}
+	.view-inner {
+		max-width: 48rem;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+	.view-header {
+		text-align: center;
+	}
+	.view-title {
+		font-size: 1.875rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		margin-bottom: 0.5rem;
+	}
+	.view-desc {
+		color: var(--text-secondary);
+		margin-bottom: 0.5rem;
+	}
+	.view-author {
+		font-size: 0.875rem;
+		color: var(--text-secondary);
+		margin-top: 0.5rem;
+	}
+	.view-author-link {
+		color: var(--primary);
+		text-decoration: underline;
+	}
+	.view-author-link:hover { color: var(--primary-hover); }
+	.view-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		justify-content: center;
+		margin-top: 1.25rem;
+	}
+	.view-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		border-radius: 9999px;
-		border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
-		background-color: color-mix(in srgb, var(--primary) 10%, transparent);
-		padding: 0.375rem 1rem;
+		padding: 0.5rem 1.25rem;
+		border-radius: 0.75rem;
 		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--primary);
-	}
-	.hero-badge-dot {
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 9999px;
-		background-color: var(--primary);
-		animation: pulse 2s infinite;
-	}
-	.btn-outline {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
 		font-weight: 600;
-		border: 1px solid var(--border);
-		background-color: transparent;
-		color: var(--text-primary);
 		transition: all 0.15s;
 		cursor: pointer;
+		border: none;
 		text-decoration: none;
 	}
-	.btn-outline:hover {
-		background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
+	.view-btn-primary {
+		background-color: var(--primary);
+		color: #F8FAFC;
 	}
-	.accordion-header {
+	.view-btn-primary:hover { background-color: var(--primary-hover); }
+	.view-btn-secondary {
+		background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
+		color: var(--text-primary);
+		border: 1px solid var(--border);
+	}
+	.view-btn-secondary:hover {
+		background-color: color-mix(in srgb, var(--text-primary) 12%, transparent);
+	}
+	.questions-count {
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+		color: var(--primary);
+	}
+	.question-item {
+		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		overflow: hidden;
+		transition: box-shadow 0.15s;
+	}
+	.question-item:hover { box-shadow: 0 2px 8px var(--shadow); }
+	.question-header {
 		width: 100%;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 1.25rem 1.5rem;
+		gap: 0.75rem;
+		padding: 0.875rem 1rem;
 		text-align: left;
 		background: none;
 		border: none;
@@ -325,90 +383,111 @@ SPDX-License-Identifier: MPL-2.0
 		cursor: pointer;
 		transition: background-color 0.15s;
 	}
-	.accordion-header:hover {
+	.question-header:hover {
 		background-color: color-mix(in srgb, var(--primary) 6%, transparent);
 	}
-	.accordion-number {
+	.question-number {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 2rem;
-		height: 2rem;
+		width: 1.75rem;
+		height: 1.75rem;
 		border-radius: 9999px;
 		background-color: color-mix(in srgb, var(--primary) 15%, transparent);
 		color: var(--primary);
+		font-size: 0.75rem;
 		font-weight: 700;
-		font-size: 0.875rem;
 		flex-shrink: 0;
 	}
-	.accordion-chevron {
-		width: 1.25rem;
-		height: 1.25rem;
+	.question-text {
+		flex: 1;
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text-primary);
+	}
+	.question-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+	.meta-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+		padding: 0.2rem 0.5rem;
+		border-radius: 9999px;
+		border: 1px solid var(--border);
+		color: var(--text-secondary);
+		background-color: color-mix(in srgb, var(--text-primary) 4%, transparent);
+	}
+	.question-chevron {
+		width: 1rem;
+		height: 1rem;
 		color: var(--text-secondary);
 		transition: transform 0.2s;
 		flex-shrink: 0;
 	}
-	.accordion-chevron-open {
-		transform: rotate(180deg);
-		color: var(--primary);
-	}
-	.accordion-body {
-		padding: 1.25rem 1.5rem 1.5rem;
+	.question-body {
+		padding: 1rem;
 		border-top: 1px solid var(--border);
+		background-color: color-mix(in srgb, var(--text-primary) 2%, transparent);
 	}
-	.accordion-screenshot {
-		border-radius: 0.75rem;
-		overflow: hidden;
-		background-color: var(--bg);
-		padding: 0.75rem;
+	.answer-tile {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-	}
-	.feature-img {
-		border-radius: 0.5rem;
-		width: 100%;
-		box-shadow: 0 4px 16px var(--shadow);
-	}
-	.feature-option {
-		display: flex;
-		align-items: flex-start;
-		gap: 1rem;
+		justify-content: space-between;
 		border-radius: 0.75rem;
-		padding: 0.875rem 1rem;
-		text-align: left;
-		transition: all 0.15s;
-		border: 1px solid transparent;
-		background-color: color-mix(in srgb, var(--text-primary) 3%, transparent);
+		padding: 0.75rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+	.answer-correct {
+		font-size: 0.75rem;
+		opacity: 0.9;
+	}
+	.answer-tile-neutral {
+		border-radius: 0.75rem;
+		padding: 0.75rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		text-align: center;
+		background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
 		color: var(--text-primary);
-		cursor: pointer;
-		width: 100%;
+		border: 1px solid var(--border);
 	}
-	.feature-option:hover {
+	.range-info {
+		text-align: center;
+		padding: 1rem;
+		border-radius: 0.75rem;
 		background-color: color-mix(in srgb, var(--primary) 8%, transparent);
+		color: var(--text-primary);
+		font-size: 0.875rem;
 	}
-	.feature-option-active {
-		background-color: color-mix(in srgb, var(--primary) 12%, transparent) !important;
-		border-color: color-mix(in srgb, var(--primary) 35%, transparent) !important;
+	.order-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border-radius: 0.75rem;
+		padding: 0.625rem 0.875rem;
+		background-color: color-mix(in srgb, var(--text-primary) 5%, transparent);
+		border: 1px solid var(--border);
+		font-size: 0.875rem;
+		color: var(--text-primary);
 	}
-	.feature-option-icon {
+	.order-number {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		border-radius: 0.5rem;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 9999px;
 		background-color: color-mix(in srgb, var(--primary) 15%, transparent);
 		color: var(--primary);
+		font-size: 0.7rem;
+		font-weight: 700;
 		flex-shrink: 0;
-	}
-	.why-classquiz::-webkit-scrollbar { width: 0.4rem; }
-	.why-classquiz::-webkit-scrollbar-track { background: transparent; }
-	.why-classquiz::-webkit-scrollbar-thumb {
-		background-color: var(--border);
-		border-radius: 9999px;
-	}
-	.why-classquiz::-webkit-scrollbar-thumb:hover {
-		background-color: var(--text-secondary);
 	}
 </style>
