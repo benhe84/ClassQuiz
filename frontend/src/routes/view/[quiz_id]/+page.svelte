@@ -49,8 +49,10 @@
 
 <!-- HEADER GRID -->
 <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+
 	<!-- LEFT: QUIZ INFO (BREIT) -->
 	<div class="lg:col-span-2 rounded-2xl border border-base bg-surface p-6 shadow-sm">
+
 		<h1 class="text-3xl font-bold text-center">
 			{@html quiz.title}
 		</h1>
@@ -82,10 +84,12 @@
 				<ModComponent quiz_id={quiz.id} />
 			{/if}
 		</div>
+
 	</div>
 
 	<!-- RIGHT: ACTIONS -->
 	<div class="rounded-2xl border border-base bg-surface p-6 shadow-sm flex flex-col gap-3">
+
 		<!-- START -->
 		{#if logged_in}
 			<GrayButton onclick={() => (start_game = quiz.id)}>
@@ -129,117 +133,106 @@
 		>
 			⚠ {$t('tooltips.report')}
 		</a>
+
 	</div>
-</div>
-<!-- QUESTIONS (KAHOOT STYLE LIST) -->
-<section class="max-w-6xl mx-auto p-4">
-	<h2 class="text-lg font-bold mb-3">Fragen</h2>
+	<!-- QUESTIONS (KAHOOT STYLE LIST) -->
+	<section class="card">
+		<h2 class="mb-4 text-lg font-bold text-base">Fragen</h2>
 
-	<div class="flex flex-col gap-3">
-		{#each quiz.questions as question, i}
-			<div class="overflow-hidden rounded-xl border border-base">
-				<button
-					class="flex w-full items-center justify-between gap-4 p-4 text-left hover:bg-surface-2 transition"
-					onclick={() => (open_question = open_question === i ? null : i)}
-				>
-					<!-- INDEX -->
-					<span class="flex items-center gap-2 font-medium flex-1">
-						<span class="text-muted">{i + 1}.</span>
+		<div class="flex flex-col gap-3">
 
-						<!-- FRAGETYP ICON -->
-						<svg
-							class="w-4 h-4 text-muted flex-shrink-0"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-						>
-							<path
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d={question.type === QuizQuestionType.ABCD
-									? 'M9 12l2 2 4-4'
-									: question.type === QuizQuestionType.RANGE
-										? 'M3 12h18'
-										: question.type === QuizQuestionType.ORDER
-											? 'M4 6h16M4 12h16'
-											: 'M3 3h18v18H3z'}
-							/>
-						</svg>
+			{#each quiz.questions as question, i}
 
-						<span class="truncate">
+				<div class="overflow-hidden rounded-xl border border-base">
+
+					<button
+						type="button"
+						class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"
+						onclick={() => open_question = open_question === i ? null : i}
+					>
+
+						<span class="flex-1 font-medium">
+							<span class="text-muted mr-2">{i + 1}.</span>
 							{@html question.question}
 						</span>
-					</span>
 
-					<!-- TIME -->
-					<span class="flex items-center gap-1 text-sm text-secondary">
-						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-							<path
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						{question.time}s
-					</span>
+						<span class="text-sm text-secondary">
+							{question.time}s
+						</span>
 
-					<!-- ANSWER COUNT -->
-					<span class="text-sm font-semibold text-success">
-						{question.answers?.length ?? 0}
-					</span>
+						<span class="text-sm font-semibold text-success">
+							{question.type}
+						</span>
 
-					<!-- CHEVRON -->
-					<svg
-						class="w-4 h-4 text-muted transition-transform"
-						style="transform: rotate({open_question === i ? 180 : 0}deg)"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-					>
-						<path
+						<svg
+							class="h-4 w-4 text-muted transition-transform"
+							style="transform: rotate({open_question === i ? 180 : 0}deg)"
+							fill="none"
+							stroke="currentColor"
 							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
-				</button>
+							viewBox="0 0 24 24"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+						</svg>
 
-				{#if open_question === i}
-					<div class="bg-surface-2 p-4">
-						{#if question.image}
-							<div class="flex justify-center mb-3">
-								<MediaComponent src={question.image} muted={true} />
-							</div>
-						{/if}
+					</button>
 
-						<!-- CONTENT (kept minimal) -->
-						{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
-							<div class="grid grid-cols-2 gap-3">
-								{#each question.answers as a, idx}
-									<div
-										class="rounded-lg p-3 text-center"
-										style="background-color: {a.color ??
-											default_colors[idx % 4]}"
-									>
-										{a.answer}
-										{#if a.right}
-											<div class="text-xs">✓</div>
-										{/if}
-									</div>
-								{/each}
-							</div>
-						{:else}
-							<div class="text-center text-sm text-muted">Details verfügbar</div>
-						{/if}
-					</div>
-				{/if}
-			</div>
-		{/each}
-	</div>
-</section>
+					{#if open_question === i}
+						<div class="bg-surface-2 p-4">
+
+							{#if question.image}
+								<div class="flex justify-center mb-3">
+									<MediaComponent src={question.image} muted={true} />
+								</div>
+							{/if}
+
+							<!-- ABCD -->
+							{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
+								<div class="grid grid-cols-2 gap-3">
+									{#each question.answers as a, idx}
+										<div
+											class="rounded-lg p-3 text-center"
+											style="
+												background-color: {a.color ?? default_colors[idx % 4]};
+												color: {get_foreground_color(a.color ?? default_colors[idx % 4])};
+											"
+										>
+											{a.answer}
+											{#if a.right}
+												<div class="text-xs mt-1">✓</div>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							{:else if question.type === QuizQuestionType.RANGE}
+								<p class="text-center">
+									{question.answers.min_correct} – {question.answers.max_correct}
+								</p>
+							{:else if question.type === QuizQuestionType.ORDER}
+								<ul class="flex flex-col gap-2">
+									{#each question.answers as a}
+										<li class="rounded-lg bg-surface p-2 text-center">
+											{a.answer}
+										</li>
+									{/each}
+								</ul>
+							{:else}
+								<div class="text-center text-sm text-muted">
+									Preview nicht relevant für diesen Typ
+								</div>
+							{/if}
+
+						</div>
+					{/if}
+
+				</div>
+
+			{/each}
+
+		</div>
+	</section>
+</div>
+	
 
 {#if start_game !== null}
 	<StartGamePopup bind:quiz_id={start_game} />
