@@ -99,7 +99,7 @@ SPDX-License-Identifier: MPL-2.0
 				<p class="text-sm" style="color:var(--text-secondary);">
 					{$t('search_page.not_found_intro')}
 					
-						class="text-primary underline-offset-2 hover:underline"
+					<a	class="text-primary underline-offset-2 hover:underline"
 						href="https://create.kahoot.it/search?query={search_term}&tags=test&filter=filter%3D1"
 						target="_blank"
 					>
