@@ -19,9 +19,7 @@ SPDX-License-Identifier: MPL-2.0
 	let { scores = $bindable(), question_results, username }: Props = $props();
 
 	function sortObjectByValue(obj: Record<string, number>) {
-		return Object.fromEntries(
-			Object.entries(obj).sort((a, b) => b[1] - a[1])
-		);
+		return Object.fromEntries(Object.entries(obj).sort((a, b) => b[1] - a[1]));
 	}
 
 	// initialisieren ohne Mutation im Top-Level Flow
@@ -66,27 +64,40 @@ SPDX-License-Identifier: MPL-2.0
 	let points_this_round = $derived(() => round_scores[username] ?? 0);
 	let total_points = $derived(() => total_scores[username] ?? 0);
 
-	let is_correct = $derived(() =>
-		question_results.find((r) => r.username === username)?.right ?? false
+	let is_correct = $derived(
+		() => question_results.find((r) => r.username === username)?.right ?? false
 	);
 </script>
 
 <div class="flex min-h-screen w-full flex-col items-center justify-center bg-base px-4">
 	<div class="w-full max-w-sm space-y-4">
-
 		<!-- Result status -->
 		<div class="flex justify-center">
 			{#if is_correct}
-				<div class="flex items-center gap-2 rounded-full bg-success/20 px-5 py-2 text-success">
+				<div
+					class="flex items-center gap-2 rounded-full bg-success/20 px-5 py-2 text-success"
+				>
 					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M5 13l4 4L19 7"
+						/>
 					</svg>
 					<span class="font-semibold">Richtig!</span>
 				</div>
 			{:else}
-				<div class="flex items-center gap-2 rounded-full bg-danger/20 px-5 py-2 text-danger">
+				<div
+					class="flex items-center gap-2 rounded-full bg-danger/20 px-5 py-2 text-danger"
+				>
 					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 					<span class="font-semibold">Falsch</span>
 				</div>
@@ -98,7 +109,6 @@ SPDX-License-Identifier: MPL-2.0
 			<p class="mb-1 text-sm font-medium text-muted">Punkte diese Runde</p>
 			<p class="text-5xl font-bold text-primary">+{points_this_round}</p>
 		</div>
-		
 
 		<!-- totals -->
 		<div class="grid grid-cols-2 gap-3">
@@ -126,7 +136,7 @@ SPDX-License-Identifier: MPL-2.0
 					{#each Object.entries(sorted_scores).slice(0, 3) as [name, score], i}
 						<div
 							class="flex items-center justify-between rounded-xl px-3 py-2 transition"
-							class:bg-primary/10={name === username}
+							class:bg-primary-soft={name === username}
 							class:bg-surface={name !== username}
 						>
 							<div class="flex items-center gap-3">
@@ -149,6 +159,5 @@ SPDX-License-Identifier: MPL-2.0
 				</div>
 			</div>
 		{/if}
-
 	</div>
 </div>
