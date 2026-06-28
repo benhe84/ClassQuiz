@@ -73,12 +73,11 @@ SPDX-License-Identifier: MPL-2.0
 	<title>ClassQuiz - {quiz.title}</title>
 </svelte:head>
 
-<div class="min-h-screen bg-base px-4 py-10">
-	<div class="mx-auto max-w-4xl">
+<div class="min-h-screen w-full bg-base p-6">
+	<div class="mx-auto max-w-6xl">
 
 		<!-- HEADER -->
-		<div class="mb-8 rounded-3xl border border-base bg-surface p-8 shadow-2xl">
-
+		<section class="card mb-6">
 			{#if quiz.cover_image}
 				<div class="mb-6 flex justify-center">
 					<img
@@ -90,7 +89,7 @@ SPDX-License-Identifier: MPL-2.0
 			{/if}
 
 			<div class="flex items-center justify-center gap-2 mb-2">
-				<h1 class="text-center text-3xl font-bold text-base">
+				<h1 class="text-2xl font-bold text-base text-center">
 					{@html quiz.title}
 				</h1>
 				<ImportedOrNot imported={quiz.imported_from_kahoot} />
@@ -108,19 +107,17 @@ SPDX-License-Identifier: MPL-2.0
 					@{quiz.user_id.username}
 				</a>
 			</p>
+		</section>
 
-			{#if mod_view}
-				<div class="mb-4 flex justify-center">
-					<ModComponent autoReturn={auto_return} quiz_id={quiz.id} />
-				</div>
-			{/if}
+		<!-- ACTIONS -->
+		<section class="card mb-6">
+			<h2 class="mb-4 text-lg font-bold text-base">Aktionen</h2>
 
-			<!-- ACTIONS + RATING -->
 			<div class="flex flex-wrap items-center justify-center gap-3">
 
 				{#if quiz.imported_from_kahoot && quiz.kahoot_id}
-					
-					<a	href="https://create.kahoot.it/details/{quiz.kahoot_id}"
+					<a
+						href="https://create.kahoot.it/details/{quiz.kahoot_id}"
 						target="_blank"
 						class="rounded-xl border border-base bg-surface-2 px-4 py-2 text-sm font-medium text-base hover:bg-surface transition"
 					>
@@ -143,8 +140,8 @@ SPDX-License-Identifier: MPL-2.0
 					</div>
 				{/if}
 
-				
-				<a	href="/practice?quiz_id={quiz.id}"
+				<a
+					href="/practice?quiz_id={quiz.id}"
 					class="rounded-xl border border-base bg-surface-2 px-4 py-2 text-sm font-medium text-base hover:bg-surface transition"
 				>
 					{$t('words.practice')}
@@ -171,127 +168,136 @@ SPDX-License-Identifier: MPL-2.0
 			</div>
 
 			<div class="mt-4 text-center">
-				<a class="text-xs text-muted underline hover:text-base" href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}">
+				<a class="text-xs text-muted underline hover:text-base"
+					href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}">
 					{$t('words.report')}
 				</a>
 			</div>
-		</div>
+		</section>
 
 		<!-- QUESTIONS -->
-		<div class="flex flex-col gap-2">
+		<section class="card">
+			<h2 class="mb-4 text-lg font-bold text-base">
+				{$t('words.question', { count: 2 })}
+			</h2>
 
-			{#each quiz.questions as question, index_question}
-				<div class="rounded-xl border border-base bg-surface overflow-hidden">
+			<div class="flex flex-col gap-2">
 
-					<CollapsSection expanded={auto_expand}>
-						{#snippet header()}
-							<div class="flex items-center gap-3 flex-1">
-								<span
-									class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-									style="background-color: {question_type_color[question.type] ?? 'var(--primary)'};"
-								>
-									{index_question + 1}
-								</span>
-								<svg
-									class="h-4 w-4 flex-shrink-0"
-									style="color: {question_type_color[question.type] ?? 'var(--primary)'};"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d={question_type_icon[question.type] ?? 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}
-									/>
-								</svg>
-								<span class="text-left font-medium text-base">{@html question.question}</span>
-							</div>
-						{/snippet}
+				{#each quiz.questions as question, index_question}
+					<div class="card overflow-hidden">
 
-						<div class="px-5 pb-5">
+						<CollapsSection expanded={auto_expand}>
+							{#snippet header()}
+								<div class="flex items-center gap-3 flex-1">
+									<span
+										class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+										style="background-color: {question_type_color[question.type] ?? 'var(--primary)'};"
+									>
+										{index_question + 1}
+									</span>
 
-							{#if question.image}
-								<div class="mb-4 flex justify-center">
-									<MediaComponent
-										css_classes="mx-auto max-h-48 rounded-xl object-contain"
-										src={question.image}
-										muted={true}
-									/>
+									<svg
+										class="h-4 w-4 flex-shrink-0"
+										style="color: {question_type_color[question.type] ?? 'var(--primary)'};"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d={question_type_icon[question.type] ?? 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}
+										/>
+									</svg>
+
+									<span class="text-left font-medium text-base">
+										{@html question.question}
+									</span>
 								</div>
-							{/if}
+							{/snippet}
 
-							<div class="mb-4 flex justify-center">
-								<div class="flex items-center gap-2 rounded-full border border-base bg-surface-2 px-3 py-1">
-									<span class="text-sm text-muted">{question.time}s</span>
-								</div>
-							</div>
+							<div class="px-5 pb-5">
 
-							<!-- ABCD / CHECK -->
-							{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
-								<div class="grid grid-cols-2 gap-3">
-
-									{#each question.answers as answer, index_answer}
-										<div
-											class="rounded-xl px-4 py-3 shadow-md border-2 transition"
-											style="
-												background-color: {answer.color ?? default_colors[index_answer % 4]};
-												color: {get_foreground_color(answer.color ?? default_colors[index_answer % 4])};
-											"
-										>
-											<p class="text-center font-medium">{answer.answer}</p>
-
-											{#if answer.right}
-												<p class="text-center text-xs mt-1 opacity-80">✓</p>
-											{/if}
-										</div>
-									{/each}
-
-								</div>
-
-							{:else if question.type === QuizQuestionType.RANGE}
-								<div class="rounded-xl border border-base bg-surface-2 px-4 py-3 text-center text-sm text-muted">
-									{question.answers.min_correct} – {question.answers.max_correct}
-									({question.answers.min} – {question.answers.max})
-								</div>
-
-							{:else if question.type === QuizQuestionType.ORDER}
-								<ul class="flex flex-col gap-2">
-									{#each question.answers as answer, i}
-										<li class="flex items-center gap-3 rounded-xl border border-base bg-surface-2 px-4 py-2">
-											<span class="text-sm text-muted">{i + 1}.</span>
-											<span class="text-base">{answer.answer}</span>
-										</li>
-									{/each}
-								</ul>
-
-							{:else if question.type === QuizQuestionType.VOTING || question.type === QuizQuestionType.TEXT}
-								<div class="grid grid-cols-2 gap-3">
-									{#each question.answers as answer}
-										<div class="rounded-xl border border-base bg-surface-2 px-4 py-3">
-											<p class="text-center text-base">{answer.answer}</p>
-										</div>
-									{/each}
-								</div>
-
-							{:else if question.type === QuizQuestionType.SLIDE}
-								{#await import('$lib/play/admin/slide.svelte')}
-									<Spinner />
-								{:then c}
-									<div class="mx-auto max-w-[90%]">
-										<c.default question={question} />
+								{#if question.image}
+									<div class="mb-4 flex justify-center">
+										<MediaComponent
+											css_classes="mx-auto max-h-48 rounded-xl object-contain"
+											src={question.image}
+											muted={true}
+										/>
 									</div>
-								{/await}
-							{/if}
+								{/if}
 
-						</div>
-					</CollapsSection>
+								<div class="mb-4 flex justify-center">
+									<div class="flex items-center gap-2 rounded-full border border-base bg-surface-2 px-3 py-1">
+										<span class="text-sm text-muted">{question.time}s</span>
+									</div>
+								</div>
 
-				</div>
-			{/each}
+								{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
+									<div class="grid grid-cols-2 gap-3">
+										{#each question.answers as answer, index_answer}
+											<div
+												class="rounded-lg px-4 py-3 border border-base bg-surface-2"
+												style="
+													background-color: {answer.color ?? default_colors[index_answer % 4]};
+													color: {get_foreground_color(answer.color ?? default_colors[index_answer % 4])};
+												"
+											>
+												<p class="text-center font-medium">{answer.answer}</p>
 
-		</div>
+												{#if answer.right}
+													<p class="text-center text-xs mt-1 opacity-80">✓</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+
+								{:else if question.type === QuizQuestionType.RANGE}
+									<div class="rounded-xl border border-base bg-surface-2 px-4 py-3 text-center text-sm text-muted">
+										{question.answers.min_correct} – {question.answers.max_correct}
+										({question.answers.min} – {question.answers.max})
+									</div>
+
+								{:else if question.type === QuizQuestionType.ORDER}
+									<ul class="flex flex-col gap-2">
+										{#each question.answers as answer, i}
+											<li class="flex items-center gap-3 rounded-xl border border-base bg-surface-2 px-4 py-2">
+												<span class="text-sm text-muted">{i + 1}.</span>
+												<span class="text-base">{answer.answer}</span>
+											</li>
+										{/each}
+									</ul>
+
+								{:else if question.type === QuizQuestionType.VOTING || question.type === QuizQuestionType.TEXT}
+									<div class="grid grid-cols-2 gap-3">
+										{#each question.answers as answer}
+											<div class="rounded-xl border border-base bg-surface-2 px-4 py-3">
+												<p class="text-center text-base">{answer.answer}</p>
+											</div>
+										{/each}
+									</div>
+
+								{:else if question.type === QuizQuestionType.SLIDE}
+									{#await import('$lib/play/admin/slide.svelte')}
+										<Spinner />
+									{:then c}
+										<div class="mx-auto max-w-[90%]">
+											<c.default question={question} />
+										</div>
+									{/await}
+								{/if}
+
+							</div>
+						</CollapsSection>
+
+					</div>
+				{/each}
+
+			</div>
+		</section>
+
 	</div>
 </div>
 
