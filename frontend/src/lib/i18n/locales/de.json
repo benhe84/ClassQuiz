@@ -298,8 +298,12 @@
     },
     "search_page": {
         "at_least_3_characters": "Mindestens 3 Zeichen eingeben...",
-        "nothing_here": "Keine Ergebnisse gefunden."
-    },
+        "nothing_here": "Keine Ergebnisse gefunden.",
+        "not_found_intro": "Nicht das Richtige gefunden? Suche auf",
+        "not_found_and": "und",
+        "not_found_import": "importiere",
+        "not_found_outro": "es!"
+    }
     "play_page": {
         "3rd place": "3. Platz",
         "end_sentence": "Das war's! Das Quiz ist beendet.",
