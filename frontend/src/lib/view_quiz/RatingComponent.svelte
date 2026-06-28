@@ -1,6 +1,5 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
 
@@ -47,22 +46,23 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="flex flex-col border-2 border-base bg-surface rounded-sm p-2 gap-2">
-	<div class="grid grid-cols-2 gap-2 group mx-auto">
+<div class="flex items-center gap-4">
+
+	<div class="flex items-center gap-1">
 		<Hoverable bind:hovering={FeedBackButtonsHovered.like}>
 			<button
-				class="bg-green-500 rounded-full h-10 w-10 transition"
+				class="flex h-9 w-9 items-center justify-center rounded-full transition"
+				style="background-color: color-mix(in srgb, var(--success) 18%, transparent);"
 				use:tippy={{ content: 'Like this quiz!' }}
 				class:opacity-40={FeedBackButtonsHovered.dislike}
 				onclick={() => complete_action(true)}
 			>
-				<!-- heroicons/thumb-up -->
 				<svg
-					class="inline-block h-6 w-6 align-middle text-black"
+					class="h-5 w-5"
+					style="color: var(--success);"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
 				>
 					<path
 						stroke-linecap="round"
@@ -73,20 +73,24 @@ SPDX-License-Identifier: MPL-2.0
 				</svg>
 			</button>
 		</Hoverable>
+		<span class="text-sm font-medium text-base">{quiz.likes}</span>
+	</div>
+
+	<div class="flex items-center gap-1">
 		<Hoverable bind:hovering={FeedBackButtonsHovered.dislike}>
 			<button
-				class="rounded-full bg-red-500 h-10 w-10 transition"
+				class="flex h-9 w-9 items-center justify-center rounded-full transition"
+				style="background-color: color-mix(in srgb, var(--danger) 18%, transparent);"
 				use:tippy={{ content: 'Dislike this quiz!' }}
 				class:opacity-40={FeedBackButtonsHovered.like}
 				onclick={() => complete_action(false)}
 			>
-				<!-- heroicons/thumb-down -->
 				<svg
-					class="inline-block h-6 w-6 align-middle text-black"
+					class="h-5 w-5"
+					style="color: var(--danger);"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
 				>
 					<path
 						stroke-linecap="round"
@@ -97,62 +101,25 @@ SPDX-License-Identifier: MPL-2.0
 				</svg>
 			</button>
 		</Hoverable>
-		<span class="text-center">{quiz.likes}</span>
-		<span class="text-center">{quiz.dislikes}</span>
+		<span class="text-sm font-medium text-base">{quiz.dislikes}</span>
 	</div>
-	<span class="w-full border-t-2 border-base"></span>
-	<div class="mx-auto grid grid-cols-2 gap-2">
-		<div class="flex flex-col">
-			<!-- heroicons/legacy-outline/Play -->
-			<svg
-				class="w-8 h-8"
-				use:tippy={{ content: 'How often the quiz was started' }}
-				aria-hidden="true"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-				<path
-					d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-			</svg>
-			<p class="mx-auto" use:tippy={{ content: 'How often the quiz was started' }}>
-				{quiz.plays}
-			</p>
-		</div>
-		<div class="flex flex-col">
-			<!-- heroicons/legacy-outline/Eye -->
-			<svg
-				class="w-8 h-8 mx-auto"
-				use:tippy={{ content: 'Quiz views' }}
-				aria-hidden="true"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-				<path
-					d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-			</svg>
-			<p class="mx-auto" use:tippy={{ content: 'Quiz views' }}>{quiz.views}</p>
-		</div>
+
+	<div class="h-6 w-px bg-base"></div>
+
+	<div class="flex items-center gap-1.5" use:tippy={{ content: 'How often the quiz was started' }}>
+		<svg class="h-5 w-5 text-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+			<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+		<span class="text-sm font-medium text-muted">{quiz.plays}</span>
 	</div>
+
+	<div class="flex items-center gap-1.5" use:tippy={{ content: 'Quiz views' }}>
+		<svg class="h-5 w-5 text-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+			<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+		<span class="text-sm font-medium text-muted">{quiz.views}</span>
+	</div>
+
 </div>
