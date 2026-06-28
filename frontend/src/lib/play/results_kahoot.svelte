@@ -98,6 +98,7 @@ SPDX-License-Identifier: MPL-2.0
 			<p class="mb-1 text-sm font-medium text-muted">Punkte diese Runde</p>
 			<p class="text-5xl font-bold text-primary">+{points_this_round}</p>
 		</div>
+		
 
 		<!-- totals -->
 		<div class="grid grid-cols-2 gap-3">
