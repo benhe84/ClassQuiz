@@ -120,6 +120,9 @@ body {
 /* ─────────────────────────────
    COMPONENT TOKENS
 ───────────────────────────── */
+.bg-surface-2 { background-color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
+.text-success { color: var(--success); }
+.text-primary-color { color: var(--primary); }
 
 .bg-base {
 	background-color: var(--bg);
@@ -129,9 +132,9 @@ body {
 	background-color: var(--surface);
 }
 
-.bg-surface-2 {
+/*.bg-surface-2 {
 	background-color: var(--surface-2);
-}
+}*/
 
 .bg-primary {
 	background-color: var(--primary);
