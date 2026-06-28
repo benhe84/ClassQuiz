@@ -4,16 +4,8 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	function sortObjectbyValue(obj) {
-		const ret = {};
-		Object.keys(obj)
-			.sort((a, b) => obj[b] - obj[a])
-			.forEach((s) => (ret[s] = obj[s]));
-		return ret;
-	}
-
 	interface Props {
-		scores: any;
+		scores: Record<string, number>;
 		question_results: Array<{
 			username: string;
 			answer: string;
@@ -21,33 +13,60 @@ SPDX-License-Identifier: MPL-2.0
 			time_taken: number;
 			score: number;
 		}>;
-		username: any;
+		username: string;
 	}
 
 	let { scores = $bindable(), question_results, username }: Props = $props();
-	let score_by_username = $state({});
 
-	if (JSON.stringify(scores) === '{}') {
-		for (const i of question_results) {
-			scores[i.username] = 0;
+	function sortObjectByValue(obj: Record<string, number>) {
+		return Object.fromEntries(
+			Object.entries(obj).sort((a, b) => b[1] - a[1])
+		);
+	}
+
+	// initialisieren ohne Mutation im Top-Level Flow
+	let base_scores = $derived(() => {
+		const copy: Record<string, number> = { ...scores };
+
+		if (Object.keys(copy).length === 0) {
+			for (const r of question_results) {
+				copy[r.username] = 0;
+			}
 		}
-	}
 
-	for (const i of question_results) {
-		score_by_username[i.username] = i.score;
-	}
+		return copy;
+	});
 
-	for (const u of Object.keys(score_by_username)) {
-		scores[u] = (score_by_username[u] ?? 0) + (scores[u] ?? 0);
-	}
+	let round_scores = $derived(() => {
+		const map: Record<string, number> = {};
+		for (const r of question_results) {
+			map[r.username] = (map[r.username] ?? 0) + r.score;
+		}
+		return map;
+	});
 
-	scores = scores;
+	let total_scores = $derived(() => {
+		const merged: Record<string, number> = { ...base_scores };
 
-	let sorted_scores = $derived(sortObjectbyValue(scores));
-	let my_rank = $derived(Object.keys(sorted_scores).findIndex((u) => u === username) + 1);
-	let points_this_round = $derived(score_by_username[username] ?? 0);
-	let total_points = $derived(sorted_scores[username] ?? 0);
-	let is_correct = $derived(
+		for (const [u, s] of Object.entries(round_scores)) {
+			merged[u] = (merged[u] ?? 0) + (s ?? 0);
+		}
+
+		return merged;
+	});
+
+	let sorted_scores = $derived(() => sortObjectByValue(total_scores));
+
+	let my_rank = $derived(() => {
+		const keys = Object.keys(sorted_scores);
+		const idx = keys.findIndex((u) => u === username);
+		return idx >= 0 ? idx + 1 : -1;
+	});
+
+	let points_this_round = $derived(() => round_scores[username] ?? 0);
+	let total_points = $derived(() => total_scores[username] ?? 0);
+
+	let is_correct = $derived(() =>
 		question_results.find((r) => r.username === username)?.right ?? false
 	);
 </script>
