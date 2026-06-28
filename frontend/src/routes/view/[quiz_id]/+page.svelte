@@ -57,44 +57,40 @@
 </svelte:head>
 
 <div class="view-page">
-	<div class="view-inner">
+	<div class="mx-auto max-w-6xl">
+		<div class="flex flex-col gap-6">
+			<!-- Header -->
+			<section class="card">
+				<h1 class="mb-4 text-lg font-bold text-base">{@html quiz.title}</h1>
+				<div class="w-full">
+					<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+						{#if quiz.cover_image}
+						<div class="rounded-xl bg-surface-2 p-4 text-center">
+							<img src="/api/v1/storage/download/{quiz.cover_image}" alt="Cover" class="max-h-48 w-auto rounded-2xl border object-contain shadow-lg" style="border-color:var(--border);" />
+						</div>
+						{/if}
+						
+						<div class="rounded-xl bg-surface-2 p-4 text-center">
+							{#if quiz.description}<p class="text-xs font-semibold uppercase tracking-wider text-muted">{@html quiz.description}</p>{/if}
+							<p class="mt-2 text-3xl font-bold text-primary">{$t('view_quiz_page.made_by')} <a href="/user/{quiz.user_id.id}" class="view-author-link">@{quiz.user_id.username}</a></p>
+						</div>	
+						<div class="rounded-xl bg-surface-2 p-4 text-center">
+							<div class="flex justify-center mt-3">
+								<ImportedOrNot imported={quiz.imported_from_kahoot} />
+							</div>
+						</div>
+						<div class="rounded-xl bg-surface-2 p-4 text-center">
+							<RatingComponent bind:quiz />
+								{#if mod_view}
+									<ModComponent quiz_id={quiz.id} />
+								{/if}
+						</div>
+					</div>
+					
+					
+					
 
-		<!-- Header -->
-		<div class="card view-header">
-			{#if quiz.cover_image}
-				<div class="flex justify-center mb-5">
-					<img
-						src="/api/v1/storage/download/{quiz.cover_image}"
-						alt="Cover"
-						class="max-h-48 w-auto rounded-2xl border object-contain shadow-lg"
-						style="border-color:var(--border);"
-					/>
-				</div>
-			{/if}
 
-			<h1 class="view-title">{@html quiz.title}</h1>
-
-			{#if quiz.description}
-				<p class="view-desc">{@html quiz.description}</p>
-			{/if}
-
-			<p class="view-author">
-				{$t('view_quiz_page.made_by')}
-				<a href="/user/{quiz.user_id.id}" class="view-author-link">
-					@{quiz.user_id.username}
-				</a>
-			</p>
-
-			<div class="flex justify-center mt-3">
-				<ImportedOrNot imported={quiz.imported_from_kahoot} />
-			</div>
-
-			<div class="flex justify-center gap-3 flex-wrap mt-4">
-				<RatingComponent bind:quiz />
-				{#if mod_view}
-					<ModComponent quiz_id={quiz.id} />
-				{/if}
-			</div>
 
 			<!-- Aktionen -->
 			<div class="view-actions">
