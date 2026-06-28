@@ -143,7 +143,7 @@
 				<!-- Kahoot -->
 				{#if quiz.imported_from_kahoot && quiz.kahoot_id}
 					
-						href="https://create.kahoot.it/details/{quiz.kahoot_id}"
+					<a	href="https://create.kahoot.it/details/{quiz.kahoot_id}"
 						target="_blank"
 						class="view-btn view-btn-secondary"
 					>
@@ -157,7 +157,7 @@
 
 			<div class="flex justify-center mt-4">
 				
-					href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
+				<a	href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
 					class="text-xs underline"
 					style="color:var(--text-secondary);"
 				>
