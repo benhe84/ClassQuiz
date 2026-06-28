@@ -63,7 +63,7 @@
 			<section class="card">
 				<h1 class="mb-4 text-lg font-bold text-base">{@html quiz.title}</h1>
 				<div class="w-full">
-					<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+					<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						{#if quiz.cover_image}
 						<div class="rounded-xl bg-surface-2 p-4 text-center">
 							<img src="/api/v1/storage/download/{quiz.cover_image}" alt="Cover" class="max-h-48 w-auto rounded-2xl border object-contain shadow-lg" style="border-color:var(--border);" />
@@ -75,31 +75,25 @@
 							<p class="mt-2 text-3xl font-bold text-primary">{$t('view_quiz_page.made_by')} <a href="/user/{quiz.user_id.id}" class="view-author-link">@{quiz.user_id.username}</a></p>
 						</div>	
 						<div class="rounded-xl bg-surface-2 p-4 text-center">
-							<div class="flex justify-center mt-3">
-								<ImportedOrNot imported={quiz.imported_from_kahoot} />
-							</div>
-						</div>
-						<div class="rounded-xl bg-surface-2 p-4 text-center">
 							<RatingComponent bind:quiz />
 								{#if mod_view}
 									<ModComponent quiz_id={quiz.id} />
 								{/if}
+								<div class="flex justify-center mt-3">
+								<ImportedOrNot imported={quiz.imported_from_kahoot} />
+							</div>
 						</div>
 					</div>
 					
 				</div>
 			<section>
 					
-					
-					
-					
-
-
-
 			<!-- Aktionen -->
-			<div class="view-actions">
-				<!-- Spiel starten -->
-				{#if logged_in}
+			<section class="card">
+				<h2 class="mb-4 text-lg font-bold text-base">Aktionen</h2>
+				<div class="w-full">
+					<div class="overflow-hidden rounded-xl border border-base">
+					{#if logged_in}
 					<button
 						onclick={() => (start_game = quiz.id)}
 						class="view-btn view-btn-primary"
@@ -121,6 +115,17 @@
 						</button>
 					</div>
 				{/if}
+					</div>
+				</div>
+			</section>
+			<section class="card"><h2 class="mb-4 text-lg font-bold text-base">Frage</h2> <div class="flex w-full flex-col gap-3"><!--[--><div class="overflow-hidden rounded-xl border border-base"><button type="button" class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"><span class="flex-1 font-medium text-base"><!---->Echt oder Fake?<!----></span> <!--[0--><span class="flex-shrink-0 text-sm text-secondary">Durchschnittliche Punktzahl: 722</span> <span class="flex-shrink-0 text-sm font-semibold text-success">1 richtige Antwort</span><!--]--> <svg class="h-4 w-4 flex-shrink-0 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></button> <!--[-1--><!--]--></div><div class="overflow-hidden rounded-xl border border-base"><button type="button" class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"><span class="flex-1 font-medium text-base"><!---->Echt oder Fake?<!----></span> <!--[0--><span class="flex-shrink-0 text-sm text-secondary">Durchschnittliche Punktzahl: 0</span> <span class="flex-shrink-0 text-sm font-semibold text-success">0 richtige Antwort</span><!--]--> <svg class="h-4 w-4 flex-shrink-0 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></button> <!--[-1--><!--]--></div><!--]--></div><!----></section></div>
+					
+
+
+
+			<div class="view-actions">
+				<!-- Spiel starten -->
+				
 
 				<!-- Üben -->
 				<a href="/practice?quiz_id={quiz.id}" class="view-btn view-btn-secondary">
