@@ -1,9 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import { QuizQuestionType } from '$lib/quiz_types';
 	import { getLocalization } from '$lib/i18n';
@@ -40,7 +38,6 @@ SPDX-License-Identifier: MPL-2.0
 		for (let i = 0; i < answers.length; i++) {
 			const a = answers[i];
 			if (question.type === QuizQuestionType.CHECK) {
-				console.log(a.answer.includes('2'), answer_id);
 				if (a.answer.includes(String(answer_id))) {
 					count++;
 				}
@@ -52,82 +49,81 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="flex justify-center">
-	<div class="bg-white p-2 -z-10 w-10/12 rounded-sm dark:bg-gray-700">
-		{#if question.type !== QuizQuestionType.ORDER && question.type !== QuizQuestionType.RANGE}
-			<div class="flex flex-col mb-4">
-				{#each question.answers as answer}
-					<div class="grid grid-cols-4">
-						<p>{answer.answer}</p>
+<div class="flex flex-col gap-6">
+	<!-- Answer distribution -->
+	{#if question.type !== QuizQuestionType.ORDER && question.type !== QuizQuestionType.RANGE}
+		<div class="flex flex-col gap-3">
+			{#each question.answers as answer}
+				{@const count = get_answer_count_for_answer(answer.answer)}
+				{@const percent = answers.length > 0 ? (count / answers.length) * 100 : 0}
+				<div class="flex items-center gap-3">
+					<span class="w-32 flex-shrink-0 truncate text-sm font-medium text-base">
+						{answer.answer}
+					</span>
+					<div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
 						<div
-							class="col-span-3 flex w-full border-l border-gray-300 px-1 dark:border-gray-500"
-						>
-							<div class="my-auto w-full mr-1">
-								<span
-									class="h-1 block bg-green-600 my-auto"
-									style="width: {(get_answer_count_for_answer(answer.answer) /
-										answers.length) *
-										100}%"
-								></span>
-							</div>
-							<p>{get_answer_count_for_answer(answer.answer)}</p>
-							{#if question.type !== QuizQuestionType.VOTING && question.type !== QuizQuestionType.TEXT}
-								<p class="ml-1">
-									{#if answer.right}✅{:else}❌{/if}
-								</p>
-							{/if}
-						</div>
+							class="h-full rounded-full bg-success"
+							style="width: {percent}%"
+						></div>
 					</div>
-				{/each}
-			</div>
-		{/if}
-		<div>
-			<table class="w-full text-left">
-				<thead>
-					<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('result_page.player_name')}
+					<span class="w-8 flex-shrink-0 text-right text-sm font-bold text-base">
+						{count}
+					</span>
+					{#if question.type !== QuizQuestionType.VOTING && question.type !== QuizQuestionType.TEXT}
+						<span class="w-5 flex-shrink-0 text-center">
+							{#if answer.right}✅{:else}❌{/if}
+						</span>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Per-player answers -->
+	<div class="overflow-hidden rounded-xl border border-base">
+		<table class="w-full text-left">
+			<thead>
+				<tr class="border-b border-base bg-surface-2">
+					<th class="p-3 text-xs font-semibold uppercase tracking-wider text-muted">
+						{$t('result_page.player_name')}
+					</th>
+					{#if question.type !== QuizQuestionType.VOTING}
+						<th class="p-3 text-xs font-semibold uppercase tracking-wider text-muted">
+							{$t('words.score')}
 						</th>
+					{/if}
+					<th class="p-3 text-xs font-semibold uppercase tracking-wider text-muted">
+						{$t('result_page.time_taken')}
+					</th>
+					<th class="p-3 text-xs font-semibold uppercase tracking-wider text-muted">
+						{$t('words.answer')}
+					</th>
+					{#if question.type !== QuizQuestionType.VOTING}
+						<th class="p-3 text-xs font-semibold uppercase tracking-wider text-muted">
+							{$t('words.correct')}?
+						</th>
+					{/if}
+				</tr>
+			</thead>
+			<tbody>
+				{#each answers as answer}
+					<tr class="border-b border-base transition hover:bg-surface-2 last:border-b-0">
+						<td class="p-3 font-medium text-base">{answer.username}</td>
 						{#if question.type !== QuizQuestionType.VOTING}
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.score')}</th
-							>
+							<td class="p-3 text-sm font-bold text-primary">{answer.score}</td>
 						{/if}
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('result_page.time_taken')}
-						</th>
-						<th class="p-1 mx-auto">{$t('words.answer')} </th>
+						<td class="p-3 text-sm text-secondary">
+							{(answer.time_taken / 1000).toFixed(3)}s
+						</td>
+						<td class="p-3 text-sm text-secondary">{answer.answer}</td>
 						{#if question.type !== QuizQuestionType.VOTING}
-							<th class="border-l dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.correct')}?
-							</th>
+							<td class="p-3 text-center">
+								{#if answer.right}✅{:else}❌{/if}
+							</td>
 						{/if}
 					</tr>
-				</thead>
-				<tbody>
-					{#each answers as answer}
-						<tr>
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{answer.username}</td
-							>
-							{#if question.type !== QuizQuestionType.VOTING}
-								<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-									>{answer.score}</td
-								>
-							{/if}
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{(answer.time_taken / 1000).toFixed(3)}s
-							</td>
-							<td class="p-1">{answer.answer}</td>
-							{#if question.type !== QuizQuestionType.VOTING}
-								<td class="p-1 border-l dark:border-gray-500 border-gray-300">
-									{#if answer.right}✅{:else}❌{/if}
-								</td>
-							{/if}
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</div>
+				{/each}
+			</tbody>
+		</table>
 	</div>
 </div>

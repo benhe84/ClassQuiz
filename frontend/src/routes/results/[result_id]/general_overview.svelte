@@ -30,7 +30,7 @@ SPDX-License-Identifier: MPL-2.0
 		[...numeric_scores].sort((a, b) => b.score - a.score)
 	);
 
-	const average_score = $derived(() => {
+	const average_score = $derived.by(() => {
 		if (numeric_scores.length === 0) return 0;
 		const total = numeric_scores.reduce((sum, s) => sum + s.score, 0);
 		return Math.round(total / numeric_scores.length);
@@ -50,28 +50,28 @@ SPDX-License-Identifier: MPL-2.0
 <div class="w-full">
 	<!-- Stat cards -->
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-		<div class="card text-center">
+		<div class="rounded-xl bg-surface-2 p-4 text-center">
 			<p class="text-xs font-semibold uppercase tracking-wider text-muted">
 				{$t('results_page.general_overview.players')}
 			</p>
 			<p class="mt-2 text-3xl font-bold text-base">{usernames.length}</p>
 		</div>
 
-		<div class="card text-center">
+		<div class="rounded-xl bg-surface-2 p-4 text-center">
 			<p class="text-xs font-semibold uppercase tracking-wider text-muted">
 				{$t('results_page.general_overview.average_score')}
 			</p>
 			<p class="mt-2 text-3xl font-bold text-primary">{average_score}</p>
 		</div>
 
-		<div class="card text-center">
+		<div class="rounded-xl bg-surface-2 p-4 text-center">
 			<p class="text-xs font-semibold uppercase tracking-wider text-muted">
 				{$t('results_page.general_overview.highest_score')}
 			</p>
 			<p class="mt-2 text-3xl font-bold text-success">{highest_score}</p>
 		</div>
 
-		<div class="card text-center">
+		<div class="rounded-xl bg-surface-2 p-4 text-center">
 			<p class="text-xs font-semibold uppercase tracking-wider text-muted">
 				{$t('results_page.general_overview.lowest_score')}
 			</p>
@@ -81,8 +81,8 @@ SPDX-License-Identifier: MPL-2.0
 
 	<!-- Score distribution -->
 	{#if sorted_scores.length > 0}
-		<div class="card mt-6">
-			<p class="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">
+		<div class="mt-6">
+			<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
 				{$t('results_page.general_overview.all_players')}
 			</p>
 

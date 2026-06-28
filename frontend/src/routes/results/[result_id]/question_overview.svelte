@@ -1,9 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import type { Question } from '$lib/quiz_types';
 	import { fly } from 'svelte/transition';
@@ -32,7 +30,7 @@ SPDX-License-Identifier: MPL-2.0
 		for (const answer of q_answers) {
 			summed_up_scores = summed_up_scores + answer.score;
 		}
-		return summed_up_scores / q_answers.length;
+		return Math.round(summed_up_scores / q_answers.length);
 	};
 
 	const get_number_of_correct_answers = (q_index: number): number => {
@@ -47,48 +45,51 @@ SPDX-License-Identifier: MPL-2.0
 	};
 
 	const toggle_dropdown = (q_index: number) => {
-		if (question_open === q_index) {
-			question_open = false;
-		} else {
-			question_open = q_index;
-		}
+		question_open = question_open === q_index ? false : q_index;
 	};
+
 	let question_open: number | boolean = $state(false);
 </script>
 
-<div class="w-full flex justify-center">
-	<div class="flex flex-col w-full gap-4">
-		{#each questions as question, i}
-			<div class="transition-all">
-				<div
-					class="w-full bg-white/60 p-2 rounded-sm grid grid-cols-3 z-40 dark:bg-gray-700/80"
-				>
-					<button
-						class="text-center underline text-xl"
-						onclick={() => {
-							toggle_dropdown(i);
-						}}>{@html question.question}</button
-					>
-					{#if question.type !== QuizQuestionType.VOTING}
-						{@const correct_answers = get_number_of_correct_answers(i)}
-						<p class="text-center text-sm my-auto">
-							{$t('result_page.average_score', {
-								average_score: get_average_score(i)
-							})}
-						</p>
-						<p class="text-center text-sm my-auto">
-							{$t('result_page.correct_answer', { count: correct_answers })}
-							<!--							{correct_answers} correct
-							{#if correct_answers === 1}Answer{:else}Answers{/if}-->
-						</p>
-					{/if}
-				</div>
-				{#if question_open === i}
-					<div in:fly={{ y: -10 }}>
-						<QuestionTab {question} answers={answers[i]} />
-					</div>
+<div class="flex w-full flex-col gap-3">
+	{#each questions as question, i}
+		<div class="overflow-hidden rounded-xl border border-base">
+			<button
+				type="button"
+				class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"
+				onclick={() => toggle_dropdown(i)}
+			>
+				<span class="flex-1 font-medium text-base">{@html question.question}</span>
+
+				{#if question.type !== QuizQuestionType.VOTING}
+					{@const correct_answers = get_number_of_correct_answers(i)}
+					<span class="flex-shrink-0 text-sm text-secondary">
+						{$t('result_page.average_score', {
+							average_score: get_average_score(i)
+						})}
+					</span>
+					<span class="flex-shrink-0 text-sm font-semibold text-success">
+						{$t('result_page.correct_answer', { count: correct_answers })}
+					</span>
 				{/if}
-			</div>
-		{/each}
-	</div>
+
+				<svg
+					class="h-4 w-4 flex-shrink-0 text-muted transition-transform"
+					class:rotate-180={question_open === i}
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					viewBox="0 0 24 24"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+				</svg>
+			</button>
+
+			{#if question_open === i}
+				<div class="border-t border-base p-4" in:fly={{ y: -10, duration: 150 }}>
+					<QuestionTab {question} answers={answers[i]} />
+				</div>
+			{/if}
+		</div>
+	{/each}
 </div>
