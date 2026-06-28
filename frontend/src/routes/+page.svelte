@@ -16,7 +16,6 @@ SPDX-License-Identifier: MPL-2.0
 	import SelectScreenshot from '$lib/assets/landing_new/select.webp';
 	import ResultScreenshot from '$lib/assets/landing_new/result.webp';
 	import WinnersScreenshot from '$lib/assets/landing_new/winners.webp';
-	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	const { t } = getLocalization();
