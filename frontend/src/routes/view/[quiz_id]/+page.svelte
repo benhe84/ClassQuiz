@@ -47,163 +47,199 @@
 	<title>ClassQuiz - View {quiz.title}</title>
 </svelte:head>
 
-<!-- HEADER CARD -->
-<div class="max-w-5xl mx-auto p-4">
+<!-- HEADER GRID -->
+<div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+	<!-- LEFT: QUIZ INFO (BREIT) -->
+	<div class="lg:col-span-2 rounded-2xl border border-base bg-surface p-6 shadow-sm">
+		<h1 class="text-3xl font-bold text-center">
+			{@html quiz.title}
+		</h1>
 
-	<div class="rounded-2xl border border-base bg-surface p-6 shadow-lg mb-6">
+		<p class="text-center text-muted mt-2">
+			{@html quiz.description}
+		</p>
 
-		<h1 class="text-3xl text-center font-bold">{@html quiz.title}</h1>
-
-		<p class="text-center text-muted mt-2">{@html quiz.description}</p>
-
-		<p class="text-center mt-2 text-sm">
+		<p class="text-center mt-2 text-sm text-muted">
 			{$t('view_quiz_page.made_by')}
-			<a href="/user/{quiz.user_id.id}" class="underline">
+			<a class="underline" href="/user/{quiz.user_id.id}">
 				@{quiz.user_id.username}
 			</a>
 		</p>
 
+		{#if quiz.cover_image}
+			<div class="flex justify-center mt-4">
+				<img
+					class="max-h-40 rounded-xl border border-base"
+					src="/api/v1/storage/download/{quiz.cover_image}"
+				/>
+			</div>
+		{/if}
+
 		<div class="flex justify-center gap-2 mt-4">
+			<ImportedOrNot imported={quiz.imported_from_kahoot} />
 			<RatingComponent bind:quiz />
 			{#if mod_view}
 				<ModComponent quiz_id={quiz.id} />
 			{/if}
 		</div>
-
-		<div class="flex justify-center gap-2 mt-4 flex-wrap">
-
-			{#if logged_in}
-				<GrayButton onclick={() => (start_game = quiz.id)}>
-					▶ Start
-				</GrayButton>
-
-				<GrayButton onclick={() => (download_id = quiz.id)}>
-					⬇ Download
-				</GrayButton>
-			{:else}
-				<div use:tippy={{ content: 'Login erforderlich' }}>
-					<GrayButton disabled={true}>▶ Start</GrayButton>
-				</div>
-			{/if}
-
-			<GrayButton href="/practice?quiz_id={quiz.id}">
-				Practice
-			</GrayButton>
-
-			{#if quiz.imported_from_kahoot && quiz.kahoot_id}
-				<GrayButton href="https://create.kahoot.it/details/{quiz.kahoot_id}">
-					Kahoot
-				</GrayButton>
-			{/if}
-
-		</div>
-
-		<div class="text-center mt-3 text-xs underline">
-			<a href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}">
-				Report
-			</a>
-		</div>
-
 	</div>
 
-	<!-- QUESTIONS (KAHOOT STYLE LIST) -->
-	<section class="card">
-		<h2 class="mb-4 text-lg font-bold text-base">Fragen</h2>
+	<!-- RIGHT: ACTIONS -->
+	<div class="rounded-2xl border border-base bg-surface p-6 shadow-sm flex flex-col gap-3">
+		<!-- START -->
+		{#if logged_in}
+			<GrayButton onclick={() => (start_game = quiz.id)}>
+				<span class="flex items-center gap-2">
+					▶ {$t('tooltips.start_game')}
+				</span>
+			</GrayButton>
+		{:else}
+			<div use:tippy={{ content: $t('tooltips.start_game_login') }}>
+				<GrayButton disabled={true}>▶ Start</GrayButton>
+			</div>
+		{/if}
 
-		<div class="flex flex-col gap-3">
+		<!-- PRACTICE -->
+		<GrayButton href="/practice?quiz_id={quiz.id}">
+			📘 {$t('words.practice')}
+		</GrayButton>
 
-			{#each quiz.questions as question, i}
+		<!-- DOWNLOAD -->
+		{#if logged_in}
+			<GrayButton onclick={() => (download_id = quiz.id)}>
+				⬇ {$t('tooltips.download')}
+			</GrayButton>
+		{:else}
+			<div use:tippy={{ content: $t('tooltips.download_login') }}>
+				<GrayButton disabled={true}>⬇ Download</GrayButton>
+			</div>
+		{/if}
 
-				<div class="overflow-hidden rounded-xl border border-base">
+		<!-- KAHOOT -->
+		{#if quiz.imported_from_kahoot && quiz.kahoot_id}
+			<GrayButton href="https://create.kahoot.it/details/{quiz.kahoot_id}">
+				🔗 Kahoot
+			</GrayButton>
+		{/if}
 
-					<button
-						type="button"
-						class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"
-						onclick={() => open_question = open_question === i ? null : i}
-					>
+		<!-- REPORT -->
+		<a
+			class="text-center text-sm underline mt-2"
+			href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
+		>
+			⚠ {$t('tooltips.report')}
+		</a>
+	</div>
+</div>
+<!-- QUESTIONS (KAHOOT STYLE LIST) -->
+<section class="max-w-6xl mx-auto p-4">
+	<h2 class="text-lg font-bold mb-3">Fragen</h2>
 
-						<span class="flex-1 font-medium">
-							<span class="text-muted mr-2">{i + 1}.</span>
-							{@html question.question}
-						</span>
+	<div class="flex flex-col gap-3">
+		{#each quiz.questions as question, i}
+			<div class="overflow-hidden rounded-xl border border-base">
+				<button
+					class="flex w-full items-center justify-between gap-4 p-4 text-left hover:bg-surface-2 transition"
+					onclick={() => (open_question = open_question === i ? null : i)}
+				>
+					<!-- INDEX -->
+					<span class="flex items-center gap-2 font-medium flex-1">
+						<span class="text-muted">{i + 1}.</span>
 
-						<span class="text-sm text-secondary">
-							{question.time}s
-						</span>
-
-						<span class="text-sm font-semibold text-success">
-							{question.type}
-						</span>
-
+						<!-- FRAGETYP ICON -->
 						<svg
-							class="h-4 w-4 text-muted transition-transform"
-							style="transform: rotate({open_question === i ? 180 : 0}deg)"
+							class="w-4 h-4 text-muted flex-shrink-0"
+							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
-							stroke-width="2"
-							viewBox="0 0 24 24"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+							<path
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d={question.type === QuizQuestionType.ABCD
+									? 'M9 12l2 2 4-4'
+									: question.type === QuizQuestionType.RANGE
+										? 'M3 12h18'
+										: question.type === QuizQuestionType.ORDER
+											? 'M4 6h16M4 12h16'
+											: 'M3 3h18v18H3z'}
+							/>
 						</svg>
 
-					</button>
+						<span class="truncate">
+							{@html question.question}
+						</span>
+					</span>
 
-					{#if open_question === i}
-						<div class="bg-surface-2 p-4">
+					<!-- TIME -->
+					<span class="flex items-center gap-1 text-sm text-secondary">
+						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+							<path
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+						{question.time}s
+					</span>
 
-							{#if question.image}
-								<div class="flex justify-center mb-3">
-									<MediaComponent src={question.image} muted={true} />
-								</div>
-							{/if}
+					<!-- ANSWER COUNT -->
+					<span class="text-sm font-semibold text-success">
+						{question.answers?.length ?? 0}
+					</span>
 
-							<!-- ABCD -->
-							{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
-								<div class="grid grid-cols-2 gap-3">
-									{#each question.answers as a, idx}
-										<div
-											class="rounded-lg p-3 text-center"
-											style="
-												background-color: {a.color ?? default_colors[idx % 4]};
-												color: {get_foreground_color(a.color ?? default_colors[idx % 4])};
-											"
-										>
-											{a.answer}
-											{#if a.right}
-												<div class="text-xs mt-1">✓</div>
-											{/if}
-										</div>
-									{/each}
-								</div>
-							{:else if question.type === QuizQuestionType.RANGE}
-								<p class="text-center">
-									{question.answers.min_correct} – {question.answers.max_correct}
-								</p>
-							{:else if question.type === QuizQuestionType.ORDER}
-								<ul class="flex flex-col gap-2">
-									{#each question.answers as a}
-										<li class="rounded-lg bg-surface p-2 text-center">
-											{a.answer}
-										</li>
-									{/each}
-								</ul>
-							{:else}
-								<div class="text-center text-sm text-muted">
-									Preview nicht relevant für diesen Typ
-								</div>
-							{/if}
+					<!-- CHEVRON -->
+					<svg
+						class="w-4 h-4 text-muted transition-transform"
+						style="transform: rotate({open_question === i ? 180 : 0}deg)"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+					>
+						<path
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M19 9l-7 7-7-7"
+						/>
+					</svg>
+				</button>
 
-						</div>
-					{/if}
+				{#if open_question === i}
+					<div class="bg-surface-2 p-4">
+						{#if question.image}
+							<div class="flex justify-center mb-3">
+								<MediaComponent src={question.image} muted={true} />
+							</div>
+						{/if}
 
-				</div>
-
-			{/each}
-
-		</div>
-	</section>
-
-</div>
+						<!-- CONTENT (kept minimal) -->
+						{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.CHECK}
+							<div class="grid grid-cols-2 gap-3">
+								{#each question.answers as a, idx}
+									<div
+										class="rounded-lg p-3 text-center"
+										style="background-color: {a.color ??
+											default_colors[idx % 4]}"
+									>
+										{a.answer}
+										{#if a.right}
+											<div class="text-xs">✓</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<div class="text-center text-sm text-muted">Details verfügbar</div>
+						{/if}
+					</div>
+				{/if}
+			</div>
+		{/each}
+	</div>
+</section>
 
 {#if start_game !== null}
 	<StartGamePopup bind:quiz_id={start_game} />
