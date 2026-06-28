@@ -425,8 +425,13 @@
     },
     "view_quiz_page": {
         "made_by": "Erstellt von",
-        "view_on_kahoot": "Original auf Kahoot! ansehen"
-    },
+        "view_on_kahoot": "Original auf Kahoot! ansehen",
+        "tooltips": {
+        "start_game": "Anmeldung erforderlich, um ein Spiel zu starten",
+        "download": "Anmeldung erforderlich, um herunterzuladen",
+        "report": "Dieses Quiz melden"
+    }
+    ,
     "start_game": {
         "start_game": "Spiel starten",
         "old_school_mode": "Old-School-Modus",
