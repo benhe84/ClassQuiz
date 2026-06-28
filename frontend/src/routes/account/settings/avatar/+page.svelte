@@ -1,9 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { fade, fly } from 'svelte/transition';
@@ -60,9 +58,9 @@ SPDX-License-Identifier: MPL-2.0
 
 	const data_keys = Object.keys(data);
 	let index = $state(0);
-	// let index = 10;
 	let save_finished: undefined | boolean = $state(undefined);
 	let finished = $state(false);
+
 	const get_image_url = (input_data) => {
 		return `/api/v1/avatar/custom?${new URLSearchParams(input_data).toString()}`;
 	};
@@ -78,68 +76,104 @@ SPDX-License-Identifier: MPL-2.0
 			save_finished = true;
 		}
 	};
+
+	const finish = () => {
+		save_finished = undefined;
+		finished = true;
+	};
 </script>
 
-<div class="h-full">
-	<div class="grid grid-cols-6 overflow-hidden h-full">
-		<div class="border-r-4 border-black h-full">
-			<img src={image_url} />
-		</div>
-		<div class="col-start-2 col-end-7 overflow-scroll">
-			<div class="flex pl-2">
-				<div class="mr-auto">
-					<BrownButton
-						onclick={() => {
-							index = index - 1;
-						}}
-						disabled={index < 1}>{$t('words.back')}</BrownButton
-					>
-				</div>
-				<div class="mx-auto">
-					<h2 class="text-2xl">
-						{translation_map[data_keys[index]]} ({index + 1}/{data_keys.length})
-					</h2>
-				</div>
-				<div class="ml-auto">
-					<BrownButton disabled={index < 11}>{$t('words.finish')}</BrownButton>
-				</div>
+<div class="flex h-screen w-full flex-col bg-base">
+	<div class="grid h-full grid-cols-1 overflow-hidden lg:grid-cols-3">
+		<!-- Preview -->
+		<div class="flex items-center justify-center border-b border-base bg-surface-2 p-8 lg:border-b-0 lg:border-r">
+			<div class="card">
+				<img src={image_url} alt="Avatar preview" class="h-64 w-64" />
 			</div>
-			<div class="grid grid-cols-4">
-				{#each Array.from(Array(item_count[data_keys[index]]).keys()) as key}
-					<button
-						class="hover:opacity-80 transition-all"
-						onclick={() => {
-							data[data_keys[index]] = key;
-							if (index < 11) {
-								index++;
-							} else {
-								save_finished = undefined;
-								finished = true;
-							}
-						}}
-					>
-						<img
-							src={get_image_url({ ...data, [data_keys[index]]: key })}
-							in:fade|global={{ duration: 100 }}
-						/>
-					</button>
-				{/each}
+		</div>
+
+		<!-- Picker -->
+		<div class="col-span-2 flex flex-col overflow-hidden">
+			<!-- Top nav -->
+			<div class="flex items-center gap-4 border-b border-base p-4">
+				<button
+					type="button"
+					class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-base transition hover:bg-surface-2"
+					class:opacity-40={index < 1}
+					disabled={index < 1}
+					onclick={() => (index = index - 1)}
+					aria-label={$t('words.back')}
+				>
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+					</svg>
+				</button>
+
+				<div class="flex-1 text-center">
+					<h2 class="text-lg font-bold text-base">
+						{translation_map[data_keys[index]]}
+					</h2>
+					<p class="text-xs text-muted">{index + 1} / {data_keys.length}</p>
+				</div>
+
+				<BrownButton
+					disabled={index < data_keys.length - 1}
+					onclick={finish}
+				>
+					{$t('words.finish')}
+				</BrownButton>
+			</div>
+
+			<!-- Progress bar -->
+			<div class="h-1 w-full bg-surface-2">
+				<div
+					class="h-full bg-primary transition-all"
+					style="width: {((index + 1) / data_keys.length) * 100}%"
+				></div>
+			</div>
+
+			<!-- Options grid -->
+			<div class="flex-1 overflow-y-auto p-4">
+				<div class="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+					{#each Array.from(Array(item_count[data_keys[index]]).keys()) as key}
+						<button
+							type="button"
+							class="option-tile"
+							onclick={() => {
+								data[data_keys[index]] = key;
+								if (index < data_keys.length - 1) {
+									index++;
+								} else {
+									finish();
+								}
+							}}
+						>
+							<img
+								src={get_image_url({ ...data, [data_keys[index]]: key })}
+								in:fade|global={{ duration: 100 }}
+								alt="Option {key + 1}"
+							/>
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
 {#if finished}
 	<div
-		class="fixed top-0 left-0 w-full h-full z-30 bg-black/90 flex justify-center flex-col"
+		class="fixed left-0 top-0 z-30 flex h-full w-full flex-col justify-center bg-black/90"
 		out:fade|global={{ duration: 200 }}
 		in:fade|global={{ duration: 300 }}
 	>
-		<h1 class="m-auto text-4xl" in:fade|global={{ delay: 3500 }}>
+		<h1 class="m-auto text-4xl font-bold text-white" in:fade|global={{ delay: 3500 }}>
 			{$t('avatar_settings.thats_you')}
 		</h1>
 		<img
-			class="m-auto w-1/2 h-1/2 z-20"
+			class="z-20 m-auto h-1/2 w-1/2"
 			src={get_image_url(data)}
+			alt="Final avatar"
 			in:fly|global={{ delay: 500, duration: 4000, y: -500, easing: bounceOut }}
 		/>
 		<div class="m-auto grid grid-cols-2 gap-4" in:fade|global={{ delay: 3500 }}>
@@ -147,10 +181,13 @@ SPDX-License-Identifier: MPL-2.0
 				onclick={() => {
 					index = 0;
 					finished = false;
-				}}>{$t('avatar_settings.start_over')}</BrownButton
+				}}
 			>
+				{$t('avatar_settings.start_over')}
+			</BrownButton>
 			<BrownButton onclick={save_avatar} flex={true} disabled={save_finished === true}>
-				{#if save_finished === undefined}{$t('words.save')}
+				{#if save_finished === undefined}
+					{$t('words.save')}
 				{:else if save_finished === true}
 					<svg
 						class="h-6 w-6"
@@ -171,8 +208,34 @@ SPDX-License-Identifier: MPL-2.0
 			<BrownButton
 				onclick={() => {
 					finished = false;
-				}}>{$t('words.close')}</BrownButton
+				}}
 			>
+				{$t('words.close')}
+			</BrownButton>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.option-tile {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		background-color: var(--surface);
+		padding: 0.5rem;
+		transition: all 0.15s;
+		cursor: pointer;
+	}
+	.option-tile:hover {
+		border-color: var(--primary);
+		background-color: color-mix(in srgb, var(--primary) 8%, transparent);
+		transform: translateY(-1px);
+	}
+	.option-tile img {
+		width: 100%;
+		height: auto;
+		border-radius: 0.5rem;
+	}
+</style>
