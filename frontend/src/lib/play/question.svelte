@@ -82,7 +82,8 @@ SPDX-License-Identifier: MPL-2.0
 	let slider_value = $state([0]);
 
 	if (question.type === QuizQuestionType.RANGE) {
-		slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+		slider_value[0] =
+			(question.answers.max - question.answers.min) / 2 + question.answers.min;
 	}
 
 	const set_answer_if_not_set_range = (time) => {
@@ -107,7 +108,9 @@ SPDX-License-Identifier: MPL-2.0
 		return _arr;
 	};
 
-	$effect(() => { set_answer_if_not_set_range(timer_res); });
+	$effect(() => {
+		set_answer_if_not_set_range(timer_res);
+	});
 
 	let circular_progress = $derived.by(() => {
 		try {
@@ -131,16 +134,17 @@ SPDX-License-Identifier: MPL-2.0
 	);
 </script>
 
-<div class="h-screen w-screen bg-[#0F172A] flex flex-col overflow-hidden">
+<div class="h-screen w-screen bg-base flex flex-col overflow-hidden">
 
 	{#if game_mode === 'normal'}
 		<div
 			class="flex flex-col justify-center px-4 pt-4"
 			style="height: {question.image ? '33.333333' : '20'}%"
 		>
-			<h1 class="text-center text-lg font-bold text-[#F8FAFC] lg:text-2xl leading-snug">
+			<h1 class="text-center text-lg font-bold text-base lg:text-2xl leading-snug">
 				{@html question.question}
 			</h1>
+
 			{#if question.image !== null && game_mode !== 'kahoot'}
 				<div class="flex justify-center mt-2 max-h-full">
 					<MediaComponent
@@ -156,13 +160,17 @@ SPDX-License-Identifier: MPL-2.0
 		{#if question.type === QuizQuestionType.ABCD || question.type === QuizQuestionType.VOTING}
 			<div class="relative flex-1" style="height: {get_div_height()}%">
 				<div class="absolute left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2">
-					<CircularTimer text={timer_res} progress={circular_progress} color="#6366F1" />
+					<CircularTimer text={timer_res} progress={circular_progress} color="var(--primary)" />
 				</div>
+
 				<div class="grid h-full grid-cols-2 grid-rows-2 gap-3 p-4">
 					{#each question.answers as answer, i}
 						<button
-							class="flex items-center justify-center rounded-2xl border-2 border-black/20 p-4 font-semibold shadow-lg transition-all duration-150 hover:scale-[1.02] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
-							style="background-color: {answer.color ?? default_colors[i % 4]}; color: {get_foreground_color(answer.color ?? default_colors[i % 4])}"
+							class="flex items-center justify-center rounded-2xl border border-base/20 p-4 font-semibold shadow-lg transition-all duration-150 hover:scale-[1.02] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
+							style="
+								background-color: {answer.color ?? default_colors[i % 4]};
+								color: {get_foreground_color(answer.color ?? default_colors[i % 4])}
+							"
 							disabled={selected_answer !== undefined}
 							onclick={() => selectAnswer(answer.answer)}
 						>
@@ -177,9 +185,10 @@ SPDX-License-Identifier: MPL-2.0
 			</div>
 
 		{:else if question.type === QuizQuestionType.RANGE}
-			<div class="h-2 w-full bg-white/10">
-				<div class="h-full bg-[#6366F1] transition-all duration-1000" style="width: {timer_pct}%"></div>
+			<div class="h-2 w-full bg-surface/30">
+				<div class="h-full bg-primary transition-all duration-1000" style="width: {timer_pct}%"></div>
 			</div>
+
 			<div class="flex flex-1 flex-col items-center justify-center gap-6 px-6">
 				{#await import('svelte-range-slider-pips')}
 					<Spinner />
@@ -195,10 +204,11 @@ SPDX-License-Identifier: MPL-2.0
 							all="label"
 						/>
 					</div>
+
 					<button
 						onclick={() => selectAnswer(slider_value[0])}
 						disabled={selected_answer !== undefined}
-						class="w-1/2 rounded-xl bg-[#6366F1] py-3 font-semibold text-white transition hover:bg-[#5558E3] disabled:opacity-40"
+						class="w-1/2 rounded-xl bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-40"
 					>
 						{$t('words.submit')}
 					</button>
@@ -206,56 +216,66 @@ SPDX-License-Identifier: MPL-2.0
 			</div>
 
 		{:else if question.type === QuizQuestionType.TEXT}
-			<div class="h-2 w-full bg-white/10">
-				<div class="h-full bg-[#6366F1] transition-all duration-1000" style="width: {timer_pct}%"></div>
+			<div class="h-2 w-full bg-surface/30">
+				<div class="h-full bg-primary transition-all duration-1000" style="width: {timer_pct}%"></div>
 			</div>
+
 			<div class="flex flex-1 flex-col items-center justify-center gap-4 px-6">
-				<p class="text-sm font-medium text-[#94A3B8]">Deine Antwort eingeben</p>
+				<p class="text-sm font-medium text-muted">Deine Antwort eingeben</p>
+
 				<input
 					type="text"
 					bind:value={text_input}
 					disabled={selected_answer !== undefined}
 					placeholder="Antwort..."
-					class="w-full rounded-xl border border-white/10 bg-[#1E293B] px-4 py-3 text-center text-[#F8FAFC] placeholder-[#475569] outline-none transition focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/30 disabled:opacity-50"
+					class="w-full rounded-xl border border-base bg-surface px-4 py-3 text-center text-base placeholder:text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
 				/>
+
 				<button
 					type="button"
 					disabled={!text_input || text_input.length === 0}
 					onclick={() => selectAnswer(text_input)}
-					class="w-1/3 rounded-xl bg-[#6366F1] py-3 font-semibold text-white transition hover:bg-[#5558E3] disabled:opacity-40"
+					class="w-1/3 rounded-xl bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-40"
 				>
 					{$t('words.submit')}
 				</button>
 			</div>
 
 		{:else if question.type === QuizQuestionType.ORDER}
-			<div class="h-2 w-full bg-white/10">
-				<div class="h-full bg-[#6366F1] transition-all duration-1000" style="width: {timer_pct}%"></div>
+			<div class="h-2 w-full bg-surface/30">
+				<div class="h-full bg-primary transition-all duration-1000" style="width: {timer_pct}%"></div>
 			</div>
+
 			<div class="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-6">
 				{#each question.answers as answer, i (answer.id)}
 					<div
-						class="w-full rounded-2xl border border-black/20 shadow-md"
+						class="w-full rounded-2xl border border-base shadow-md"
 						animate:flip={{ duration: 100 }}
-						style="background-color: {answer.color ?? '#6366F1'}"
+						style="background-color: var(--primary)"
 					>
 						<button
-							onclick={() => { question.answers = swapArrayElements(question.answers, i, i - 1); }}
-							class="flex w-full justify-center rounded-t-2xl bg-black/20 py-2 transition hover:bg-black/30 disabled:opacity-40"
+							onclick={() => {
+								question.answers = swapArrayElements(question.answers, i, i - 1);
+							}}
+							class="flex w-full justify-center rounded-t-2xl bg-black/20 py-2 transition hover:bg-black/30"
 							type="button"
-							aria-label="Nach oben"
 							disabled={i === 0 || Boolean(selected_answer)}
 						>
 							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
 							</svg>
 						</button>
-						<p class="w-full py-3 text-center text-xl font-semibold text-white">{answer.answer}</p>
+
+						<p class="w-full py-3 text-center text-xl font-semibold text-white">
+							{answer.answer}
+						</p>
+
 						<button
-							onclick={() => { question.answers = swapArrayElements(question.answers, i, i + 1); }}
-							class="flex w-full justify-center rounded-b-2xl bg-black/20 py-2 transition hover:bg-black/30 disabled:opacity-40"
+							onclick={() => {
+								question.answers = swapArrayElements(question.answers, i, i + 1);
+							}}
+							class="flex w-full justify-center rounded-b-2xl bg-black/20 py-2 transition hover:bg-black/30"
 							type="button"
-							aria-label="Nach unten"
 							disabled={i === question.answers.length - 1 || Boolean(selected_answer)}
 						>
 							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -264,11 +284,12 @@ SPDX-License-Identifier: MPL-2.0
 						</button>
 					</div>
 				{/each}
+
 				<button
 					type="button"
 					disabled={Boolean(selected_answer)}
 					onclick={() => select_complex_answer(question.answers)}
-					class="mt-2 w-full rounded-xl bg-[#6366F1] py-3 font-semibold text-white transition hover:bg-[#5558E3] disabled:opacity-40"
+					class="mt-2 w-full rounded-xl bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-40"
 				>
 					{$t('words.submit')}
 				</button>
@@ -290,7 +311,7 @@ SPDX-License-Identifier: MPL-2.0
 						type="button"
 						disabled={selected_answer === undefined}
 						onclick={() => selectAnswer(selected_answer)}
-						class="w-1/2 rounded-xl bg-[#6366F1] py-3 font-semibold text-white transition hover:bg-[#5558E3] disabled:opacity-40"
+						class="w-1/2 rounded-xl bg-primary py-3 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-40"
 					>
 						{$t('words.submit')}
 					</button>

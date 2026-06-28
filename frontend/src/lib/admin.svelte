@@ -89,7 +89,7 @@ SPDX-License-Identifier: MPL-2.0
 {/if}
 {#if game_state.timer_res !== '0' && game_state.selected_question >= 0}
 	<div
-		class="fixed left-0 h-1 bg-[#6366F1] transition-all duration-1000 z-30"
+		class="fixed left-0 h-1 transition-all duration-1000 z-30"
 		class:top-12={game_state.control_visible}
 		class:top-0={!game_state.control_visible}
 		style="width: {(100 / parseInt(game_state.quiz_data.questions[game_state.selected_question].time)) * parseInt(game_state.timer_res)}vw"
@@ -160,9 +160,9 @@ SPDX-License-Identifier: MPL-2.0
 					alt="Quiz-Titelbild"
 				/>
 			{/if}
-			<h1 class="text-5xl font-bold text-center text-[#F8FAFC] leading-tight">{@html game_state.quiz_data.title}</h1>
+			<h1 class="text-5xl font-bold text-center text-base leading-tight">{@html game_state.quiz_data.title}</h1>
 			{#if game_state.quiz_data.description}
-				<p class="text-2xl text-center text-[#94A3B8]">{@html game_state.quiz_data.description}</p>
+				<p class="text-2xl text-center text-muted">{@html game_state.quiz_data.description}</p>
 			{/if}
 		</div>
 	{/if}

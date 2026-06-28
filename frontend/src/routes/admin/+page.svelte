@@ -22,6 +22,7 @@ SPDX-License-Identifier: MPL-2.0
 
 	footerVisible.visible = false;
 	navbarVisible.visible = false;
+
 	const { t } = getLocalization();
 
 	interface Props {
@@ -57,25 +58,25 @@ SPDX-License-Identifier: MPL-2.0
 			this.answer_count = $state(0);
 		}
 
-		is_game_ready_to_start(): boolean {
+		is_game_ready_to_start() {
 			return !this.game_started && this.players.length > 0;
 		}
-		is_game_starting(): boolean {
+		is_game_starting() {
 			return this.game_started && this.selected_question === -1;
 		}
-		is_active_question_last_question(): boolean {
+		is_active_question_last_question() {
 			return this.selected_question + 1 === this.quiz_data.questions.length;
 		}
-		is_question_results_visible(): boolean {
+		is_question_results_visible() {
 			return this.timer_res === '0' && this.question_results !== null;
 		}
-		is_active_question_slide(): boolean {
+		is_active_question_slide() {
 			return this.quiz_data?.questions?.[this.selected_question]?.type === QuizQuestionType.SLIDE;
 		}
-		is_question_ended(): boolean {
+		is_question_ended() {
 			return this.timer_res === '0' && this.question_results === null && this.selected_question !== -1;
 		}
-		is_question_still_ongoing(): boolean {
+		is_question_still_ongoing() {
 			return this.timer_res !== '0' && this.selected_question !== -1;
 		}
 	}
@@ -84,18 +85,20 @@ SPDX-License-Identifier: MPL-2.0
 	let game_mode = $state();
 	let { auto_connect, game_token } = $state(data);
 	const game_pin = data.game_pin;
+
 	let errorMessage = $state('');
 	let success = $state(false);
-	let dataexport_download_a = $state();
-	let warnToLeave = true;
-	let export_token = $state(undefined);
+	let export_token = $state<string | undefined>(undefined);
 	let results_saved = $state(false);
 
-	const socket_game_controls: SocketGameControls = new SocketGameControls(socket);
-	let game_state: GameState = $state(new GameState(game_token));
+	let warnToLeave = true;
+
+	const socket_game_controls = new SocketGameControls(socket);
+	let game_state = $state(new GameState(game_token));
 
 	const connect = async () => {
 		socket.emit('register_as_admin', { game_pin, game_id: game_token });
+
 		const res = await fetch(`/api/v1/quiz/play/check_captcha/${game_pin}`);
 		const json = await res.json();
 		game_mode = json.game_mode;
@@ -110,43 +113,42 @@ SPDX-License-Identifier: MPL-2.0
 		game_state.quiz_data = JSON.parse(data['game']);
 		success = true;
 	});
-	socket.on('player_joined', (int_data) => {
-		game_state.players = [...game_state.players, int_data];
+
+	socket.on('player_joined', (p) => {
+		game_state.players = [...game_state.players, p];
 	});
-	socket.on('already_registered_as_admin', () => {
-		errorMessage = $t('admin_page.already_registered_as_admin');
-	});
-	socket.on('start_game', (_) => {
+
+	socket.on('start_game', () => {
 		game_state.game_started = true;
 	});
+
 	socket.on('control_visibility', (data) => {
 		game_state.control_visible = data.visible;
 	});
-	socket.on('export_token', (int_data) => {
+
+	socket.on('export_token', (token) => {
 		warnToLeave = false;
-		export_token = int_data;
-		setTimeout(() => { warnToLeave = true; }, 200);
+		export_token = token;
+		setTimeout(() => (warnToLeave = true), 200);
 	});
-	socket.on('results_saved_successfully', (_) => {
+
+	socket.on('results_saved_successfully', () => {
 		results_saved = true;
 	});
 
-	const confirmUnload = () => {
-		if (warnToLeave) {
-			event.preventDefault();
-			event.returnValue = '';
-		}
+	const confirmUnload = (event: BeforeUnloadEvent) => {
+		if (!warnToLeave) return;
+		event.preventDefault();
+		event.returnValue = '';
 	};
 
-	const request_answer_export = (e: Event) => {
-		e.preventDefault();
+	const request_answer_export = () => {
 		socket.emit('get_export_token');
 	};
-	const save_quiz = () => { socket.emit('save_quiz'); };
 
-	let bg_color = $derived(game_state.quiz_data ? game_state.quiz_data.background_color : undefined);
-	let bg_image = $derived(game_state.quiz_data ? game_state.quiz_data.background_image : undefined);
-	let show_final_results = $derived(JSON.stringify(game_state.final_results) !== JSON.stringify([null]));
+	const save_quiz = () => {
+		socket.emit('save_quiz');
+	};
 
 	const next_action = () => {
 		if (
@@ -165,67 +167,44 @@ SPDX-License-Identifier: MPL-2.0
 			game_state.timer_res = '0';
 		} else if (game_state.is_question_ended()) {
 			socket_game_controls.get_question_results(game_token, game_state.shown_question_now);
-		} else {
-			console.warn('No action available for this event');
 		}
 	};
 </script>
 
 <svelte:window onbeforeunload={confirmUnload} />
-<svelte:head>
-	<title>ClassQuiz - Host</title>
-</svelte:head>
 
 <div
 	class="min-h-screen min-w-full"
-	style="background-repeat: no-repeat; background-size: 100% 100%; background-image: {bg_image ? `url('${bg_image}')` : 'unset'}; background-color: {bg_color ? bg_color : 'transparent'}"
-	class:text-black={bg_color}
 >
 	{#if show_final_results}
 		{#if game_state.control_visible}
 			<div class="fixed top-4 right-4 z-50 flex flex-col gap-2">
 				{#if export_token === undefined}
-					<button
-						onclick={request_answer_export}
-						class="rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-sm font-medium text-[#F8FAFC] shadow-lg transition hover:bg-[#2D3F55]"
-					>
-						{$t('admin_page.request_export_results')}
+					<button on:click={request_answer_export}>
+						Export anfordern
 					</button>
 				{:else}
 					<a
+						href="/api/v1/quiz/export_data/{export_token}?ts={Date.now()}&game_pin={game_pin}"
 						target="_blank"
-						href="/api/v1/quiz/export_data/{export_token}?ts={new Date().getTime()}&game_pin={game_pin}"
-						class="rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-center text-sm font-medium text-[#F8FAFC] shadow-lg transition hover:bg-[#2D3F55]"
 					>
-						{$t('admin_page.download_export_results')}
+						Download Export
 					</a>
 				{/if}
 
-				<button
-					onclick={save_quiz}
-					disabled={results_saved}
-					class="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-sm font-medium text-[#F8FAFC] shadow-lg transition hover:bg-[#2D3F55] disabled:opacity-50"
-				>
-					{#if results_saved}
-						<svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-						</svg>
-						Gespeichert
-					{:else}
-						{$t('admin_page.save_results')}
-					{/if}
+				<button on:click={save_quiz} disabled={results_saved}>
+					{results_saved ? 'Gespeichert' : 'Speichern'}
 				</button>
 			</div>
 		{/if}
+
 		<FinalResults bind:data={game_state.player_scores} {show_final_results} />
 	{/if}
 
 	{#if !success}
-		{#if errorMessage !== ''}
-			<div class="flex min-h-screen items-center justify-center bg-[#0F172A]">
-				<div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
-					{errorMessage}
-				</div>
+		{#if errorMessage}
+			<div class="flex min-h-screen items-center justify-center">
+				{errorMessage}
 			</div>
 		{/if}
 	{:else if !game_state.game_started}
@@ -236,17 +215,6 @@ SPDX-License-Identifier: MPL-2.0
 			cqc_code={page.url.searchParams.get('cqc_code')}
 		/>
 	{:else}
-		<SomeAdminScreen {game_token} {bg_color} bind:game_state />
+		<SomeAdminScreen {game_token} bind:game_state />
 	{/if}
 </div>
-
-
-	onclick={request_answer_export}
-<a
-	onclick={request_answer_export}
-	href="#"
-	target="_blank"
-	bind:this={dataexport_download_a}
-	download=""
-	class="absolute -top-3/4 -left-3/4 opacity-0"
->Download</a>

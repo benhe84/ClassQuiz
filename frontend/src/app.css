@@ -2,78 +2,103 @@
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 */
+
 @import 'tippy.js/animations/perspective-subtle.css';
 @import 'tippy.js/dist/tippy.css';
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 @tailwind utilities;
 
-/* ── DESIGN TOKENS ── */
+/* ─────────────────────────────
+   DESIGN TOKENS
+───────────────────────────── */
+
 :root {
-	/* Light Mode */
-	--bg:              	#F8FAFC;
-	--surface:         	#FFFFFF;
-	--primary:         	#4F46E5;
-	--primary-hover:   	#6366F1;
-	--secondary:       	#0F766E;
-	--text:            	#0F172A;
-	--text-primary:		#0F172A;
-	--text-secondary:	#475569;
-	--border:          #E2E8F0;
-	--success:         #16A34A;
-	--warning:         #D97706;
-	--danger:          #DC2626;
-	--shadow:          rgba(15, 23, 42, 0.08);
-	--answer-a:        #3B82F6;
-	--answer-b:        #10B981;
-	--answer-c:        #F59E0B;
-	--answer-d:        #8B5CF6;
+	/* Base */
+	--bg: #F8FAFC;
+	--surface: #FFFFFF;
+	--surface-2: #F1F5F9;
+
+	/* Brand */
+	--primary: #4F46E5;
+	--primary-hover: #6366F1;
+	--primary-active: #3730A3;
+
+	--secondary: #0F766E;
+	--secondary-hover: #14B8A6;
+	--secondary-active: #115E59;
+
+	/* Text */
+	--text-primary: #0F172A;
+	--text-secondary: #475569;
+	--text-muted: #64748B;
+
+	/* UI */
+	--border: #E2E8F0;
+	--shadow: rgba(15, 23, 42, 0.08);
+
+	/* States */
+	--success: #16A34A;
+	--warning: #D97706;
+	--danger: #DC2626;
+
+	/* Answer colors */
+	--answer-a: #3B82F6;
+	--answer-b: #10B981;
+	--answer-c: #F59E0B;
+	--answer-d: #8B5CF6;
+
+	--answer-a-hover: #60A5FA;
+	--answer-b-hover: #34D399;
+	--answer-c-hover: #FBBF24;
+	--answer-d-hover: #A78BFA;
+
+	--answer-a-active: #1D4ED8;
+	--answer-b-active: #059669;
+	--answer-c-active: #D97706;
+	--answer-d-active: #7C3AED;
+
+	/* Charts */
+	--chart-1: #6366F1;
+	--chart-2: #14B8A6;
+	--chart-3: #3B82F6;
+	--chart-4: #8B5CF6;
+	--chart-5: #F59E0B;
+	--chart-6: #22C55E;
 }
 
+/* Dark mode overrides */
 .dark {
-	/* Dark Mode */
-	--bg:              #0F172A;
-	--surface:         #1E293B;
-	--primary:         #6366F1;
-	--primary-hover:   #818CF8;
-	--secondary:       #14B8A6;
-	--success:         #22C55E;
-	--warning:         #F59E0B;
-	--danger:          #EF4444;
-	--text-primary:    #F8FAFC;
-	--text-secondary:  #CBD5E1;
-	--border:          #334155;
-	--shadow:          rgba(0, 0, 0, 0.30);
+	--bg: #0F172A;
+	--surface: #1E293B;
+	--surface-2: #111827;
+
+	--primary: #6366F1;
+	--primary-hover: #818CF8;
+	--primary-active: #4F46E5;
+
+	--secondary: #14B8A6;
+	--secondary-hover: #2DD4BF;
+	--secondary-active: #0F766E;
+
+	--text-primary: #F8FAFC;
+	--text-secondary: #CBD5E1;
+	--text-muted: #94A3B8;
+
+	--border: #334155;
+	--shadow: rgba(0, 0, 0, 0.30);
+
+	--success: #22C55E;
+	--warning: #F59E0B;
+	--danger: #EF4444;
 }
 
-/* Answer Colors (theme-independent) */
-:root {
-	--answer-a:          #3B82F6;
-	--answer-b:          #10B981;
-	--answer-c:          #F59E0B;
-	--answer-d:          #8B5CF6;
-	--answer-a-hover:    #60A5FA;
-	--answer-b-hover:    #34D399;
-	--answer-c-hover:    #FBBF24;
-	--answer-d-hover:    #A78BFA;
-	--answer-a-active:   #1D4ED8;
-	--answer-b-active:   #059669;
-	--answer-c-active:   #D97706;
-	--answer-d-active:   #7C3AED;
-	--correct:           #22C55E;
-	--incorrect:         #EF4444;
-	--partial:           #F59E0B;
-	--unanswered:        #64748B;
-	--chart-1:           #6366F1;
-	--chart-2:           #14B8A6;
-	--chart-3:           #3B82F6;
-	--chart-4:           #8B5CF6;
-	--chart-5:           #F59E0B;
-	--chart-6:           #22C55E;
-}
+/* ─────────────────────────────
+   BASE
+───────────────────────────── */
 
-/* ── BASE ── */
-html, body {
+html,
+body {
 	background-color: var(--bg);
 	color: var(--text-primary);
 	min-height: 100vh;
@@ -84,12 +109,71 @@ body {
 	flex-direction: column;
 }
 
-/* ── TYPOGRAPHY ── */
+/* ─────────────────────────────
+   TYPOGRAPHY
+───────────────────────────── */
+
 .marck-script {
 	font-family: 'Marck Script';
 }
 
-/* ── GLOBAL COMPONENTS ── */
+/* ─────────────────────────────
+   COMPONENT TOKENS
+───────────────────────────── */
+
+.bg-base {
+	background-color: var(--bg);
+}
+
+.bg-surface {
+	background-color: var(--surface);
+}
+
+.bg-surface-2 {
+	background-color: var(--surface-2);
+}
+
+.bg-primary {
+	background-color: var(--primary);
+}
+
+.bg-secondary {
+	background-color: var(--secondary);
+}
+
+.bg-muted {
+	background-color: var(--surface-2);
+}
+
+.text-base {
+	color: var(--text-primary);
+}
+
+.text-muted {
+	color: var(--text-muted);
+}
+
+.text-secondary {
+	color: var(--text-secondary);
+}
+
+.border-base {
+	border-color: var(--border);
+}
+
+/* hover helpers */
+.hover\:bg-primary:hover {
+	background-color: var(--primary-hover);
+}
+
+.hover\:bg-secondary:hover {
+	background-color: var(--secondary-hover);
+}
+
+/* ─────────────────────────────
+   BUTTONS (legacy + utility hybrid)
+───────────────────────────── */
+
 .btn {
 	display: inline-flex;
 	align-items: center;
@@ -108,14 +192,42 @@ body {
 	background-color: var(--primary);
 	color: #F8FAFC;
 }
-.btn-primary:hover { background-color: var(--primary-hover); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary:hover {
+	background-color: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.btn-secondary {
+	background-color: var(--secondary);
+	color: #F8FAFC;
+}
+
+.btn-secondary:hover {
+	background-color: var(--secondary-hover);
+}
+
+.btn-secondary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
 
 .btn-danger {
 	background-color: color-mix(in srgb, var(--danger) 20%, transparent);
 	color: var(--danger);
 }
-.btn-danger:hover { background-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+
+.btn-danger:hover {
+	background-color: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+/* ─────────────────────────────
+   SURFACES / CARDS / INPUTS
+───────────────────────────── */
 
 .card {
 	background-color: var(--surface);
@@ -126,78 +238,117 @@ body {
 }
 
 .input {
-  background-color: var(--surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  caret-color: var(--text-primary);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 0.15s;
-  width: 100%;
+	background-color: var(--surface);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+	border-radius: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	outline: none;
+	transition: border-color 0.15s;
+	width: 100%;
+	caret-color: var(--text-primary);
 }
 
-/* wichtig für Platzhalter */
 .input::placeholder {
-  color: var(--text-secondary);
-  opacity: 1;
+	color: var(--text-secondary);
+	opacity: 1;
 }
 
-/* verhindert Autofill-Kontrastprobleme (Chrome) */
-.input:-webkit-autofill {
-  -webkit-text-fill-color: var(--text-primary);
-  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+.input:focus {
+	border-color: var(--primary);
 }
-.input:focus { border-color: var(--primary); }
+
+.input:-webkit-autofill {
+	-webkit-text-fill-color: var(--text-primary);
+	-webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+}
+
+/* ─────────────────────────────
+   LABELS
+───────────────────────────── */
 
 .label {
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	color: var(--text-secondary);
-	display: block;
+	color: var(--text-muted);
 	margin-bottom: 0.5rem;
 }
 
-/* ── ANSWER BUTTONS ── */
+/* ─────────────────────────────
+   ANSWERS
+───────────────────────────── */
+
 .answer-btn {
 	border-radius: 0.75rem;
 	padding: 1rem;
 	font-weight: 700;
 	font-size: 1rem;
 	color: white;
-	transition: all 0.15s;
-	cursor: pointer;
-	border: none;
 	width: 100%;
+	border: none;
+	cursor: pointer;
+	transition: all 0.15s;
 }
-.answer-a { background-color: var(--answer-a); }
-.answer-a:hover { background-color: var(--answer-a-hover); }
-.answer-a.selected { background-color: var(--answer-a-active); }
 
-.answer-b { background-color: var(--answer-b); }
-.answer-b:hover { background-color: var(--answer-b-hover); }
-.answer-b.selected { background-color: var(--answer-b-active); }
+.answer-a {
+	background-color: var(--answer-a);
+}
 
-.answer-c { background-color: var(--answer-c); }
-.answer-c:hover { background-color: var(--answer-c-hover); }
-.answer-c.selected { background-color: var(--answer-c-active); }
+.answer-a:hover {
+	background-color: var(--answer-a-hover);
+}
 
-.answer-d { background-color: var(--answer-d); }
-.answer-d:hover { background-color: var(--answer-d-hover); }
-.answer-d.selected { background-color: var(--answer-d-active); }
+.answer-a.selected {
+	background-color: var(--answer-a-active);
+}
+
+.answer-b {
+	background-color: var(--answer-b);
+}
+
+.answer-b:hover {
+	background-color: var(--answer-b-hover);
+}
+
+.answer-b.selected {
+	background-color: var(--answer-b-active);
+}
+
+.answer-c {
+	background-color: var(--answer-c);
+}
+
+.answer-c:hover {
+	background-color: var(--answer-c-hover);
+}
+
+.answer-c.selected {
+	background-color: var(--answer-c-active);
+}
+
+.answer-d {
+	background-color: var(--answer-d);
+}
+
+.answer-d:hover {
+	background-color: var(--answer-d-hover);
+}
+
+.answer-d.selected {
+	background-color: var(--answer-d-active);
+}
+
+/* ─────────────────────────────
+   BASE LAYER FIXES
+───────────────────────────── */
 
 @layer base {
+
 	button:not(:disabled),
 	[role='button']:not(:disabled) {
 		cursor: pointer;
 	}
 }
-
-.bg-surface { background-color: var(--surface); }
-.bg-base    { background-color: var(--bg); }
-.text-base  { color: var(--text-primary); }
-.text-muted { color: var(--text-secondary); }
-.border-base { border-color: var(--border); }

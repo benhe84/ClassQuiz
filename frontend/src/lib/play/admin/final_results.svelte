@@ -27,11 +27,15 @@ SPDX-License-Identifier: MPL-2.0
 		})
 	);
 
-	let player_count_or_five = $derived(player_names.length >= 5 ? 5 : player_names.length);
+	let player_count_or_five = $derived(
+		player_names.length >= 5 ? 5 : player_names.length
+	);
+
 	let canvas: HTMLCanvasElement = $state();
 
 	const medals = ['🥇', '🥈', '🥉'];
-	const rank_colors = ['text-yellow-400', 'text-gray-300', 'text-amber-600'];
+
+	const rank_colors = ['text-warning', 'text-base', 'text-warning'];
 	const rank_sizes = ['text-5xl', 'text-4xl', 'text-3xl', 'text-2xl', 'text-xl'];
 
 	onMount(() => {
@@ -45,43 +49,64 @@ SPDX-License-Identifier: MPL-2.0
 {#if show_final_results}
 	<canvas bind:this={canvas} class="pointer-events-none fixed inset-0 h-full w-full"></canvas>
 
-	<div class="flex min-h-screen w-full flex-col items-center justify-center bg-[#0F172A] px-4 py-12">
+	<div class="flex min-h-screen w-full flex-col items-center justify-center bg-base px-4 py-12">
 
+		<!-- Header -->
 		<div class="mb-10 text-center">
-			<h1 class="text-4xl font-bold text-[#F8FAFC]">Endergebnis</h1>
-			<p class="mt-2 text-sm text-[#94A3B8]">Die besten Teilnehmenden</p>
+			<h1 class="text-4xl font-bold text-base">Endergebnis</h1>
+			<p class="mt-2 text-sm text-muted">Die besten Teilnehmenden</p>
 		</div>
 
+		<!-- Leaderboard -->
 		<div class="w-full max-w-lg space-y-3">
 			{#each player_names as player, i}
 				{#if i <= player_count_or_five - 1}
 					<div
-						in:fly|global={{ y: -60, delay: player_count_or_five * 1200 - (i + 1) * 1000, duration: 400 }}
-						class="flex items-center justify-between rounded-2xl border border-white/10 bg-[#1E293B] px-5 py-4 shadow-lg"
+						in:fly|global={{
+							y: -60,
+							delay: player_count_or_five * 1200 - (i + 1) * 1000,
+							duration: 400
+						}}
+						class="card flex items-center justify-between"
 					>
 						<div class="flex items-center gap-4">
 							<span class="text-2xl">
-								{#if i < 3}{medals[i]}{:else}<span class="text-lg font-bold text-[#475569]">#{i + 1}</span>{/if}
+								{#if i < 3}
+									{medals[i]}
+								{:else}
+									<span class="text-lg font-bold text-muted">#{i + 1}</span>
+								{/if}
 							</span>
-							<span class="{rank_sizes[i] ?? 'text-lg'} font-semibold {i < 3 ? rank_colors[i] : 'text-[#F8FAFC]'}">
+
+							<span
+								class="font-semibold"
+								class:text-base={i >= 3}
+								class:text-primary={i < 3}
+								class:text-lg={i >= 3}
+							>
 								{player}
 							</span>
 						</div>
-						<span class="font-mono text-lg font-bold text-[#6366F1]">{data[player]}</span>
+
+						<span class="font-mono text-lg font-bold text-primary">
+							{data[player]}
+						</span>
 					</div>
 				{/if}
 			{/each}
 		</div>
 
+		<!-- User panel -->
 		{#if data[username]}
 			<div class="fixed bottom-6 left-0 flex w-full justify-center px-4">
-				<div class="rounded-2xl border border-[#6366F1]/40 bg-[#1E293B] px-6 py-4 shadow-2xl">
-					<p class="text-center text-sm font-medium text-[#94A3B8]">
+				<div class="card">
+					<p class="text-center text-sm font-medium text-muted">
 						{$t('play_page.your_score', { score: data[username] })}
 					</p>
+
 					{#each player_names as player, i}
 						{#if player === username}
-							<p class="text-center text-lg font-bold text-[#F8FAFC]">
+							<p class="text-center text-lg font-bold text-base">
 								{$t('play_page.your_place', { place: i + 1 })}
 							</p>
 						{/if}
@@ -89,5 +114,6 @@ SPDX-License-Identifier: MPL-2.0
 				</div>
 			</div>
 		{/if}
+
 	</div>
 {/if}

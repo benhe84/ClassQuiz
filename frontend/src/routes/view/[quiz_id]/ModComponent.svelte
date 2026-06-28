@@ -1,6 +1,5 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
 
@@ -14,7 +13,8 @@ SPDX-License-Identifier: MPL-2.0
 	}
 
 	let { autoReturn = false, quiz_id }: Props = $props();
-	let mod_rating: number | undefined = $state();
+
+	let mod_rating = $state<number | null | undefined>(undefined);
 
 	const submit = async () => {
 		const res = await fetch(`/api/v1/moderation/rating/set/${quiz_id}`, {
@@ -24,36 +24,48 @@ SPDX-License-Identifier: MPL-2.0
 			},
 			body: JSON.stringify({ rating: mod_rating })
 		});
-		if (res.ok && autoReturn) {
-			window.history.back();
-		}
+
 		if (!res.ok) {
 			alert('Setting rating failed');
+			return;
+		}
+
+		if (autoReturn) {
+			window.history.back();
 		}
 	};
 </script>
 
-<div class="rounded-sm border-2 border-[#EC4899] flex flex-col w-fit gap-2 p-2">
-	<div class:opacity-50={mod_rating !== null && mod_rating !== undefined} class="transition">
+<div class="card border-2 border-base bg-surface flex flex-col w-fit gap-2 p-2">
+		<div class:opacity-50={mod_rating !== null}>
 		<BrownButton onclick={() => (mod_rating = null)}>Not Checked</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 0 && mod_rating !== undefined} class="transition">
+
+	<div class:opacity-50={mod_rating !== 0}>
 		<BrownButton onclick={() => (mod_rating = 0)}>Ok</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 1 && mod_rating !== undefined} class="transition">
+
+	<div class:opacity-50={mod_rating !== 1}>
 		<BrownButton onclick={() => (mod_rating = 1)}>Attention</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 2 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 2)}>NFSW</BrownButton>
+
+	<div class:opacity-50={mod_rating !== 2}>
+		<BrownButton onclick={() => (mod_rating = 2)}>NSFW</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 3 && mod_rating !== undefined} class="transition">
+
+	<div class:opacity-50={mod_rating !== 3}>
 		<BrownButton onclick={() => (mod_rating = 3)}>Plausibility Checked</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 4 && mod_rating !== undefined} class="transition">
+
+	<div class:opacity-50={mod_rating !== 4}>
 		<BrownButton onclick={() => (mod_rating = 4)}>Fact Checked</BrownButton>
 	</div>
-	<div class:opacity-50={mod_rating !== 5 && mod_rating !== undefined} class="transition">
+
+	<div class:opacity-50={mod_rating !== 5}>
 		<BrownButton onclick={() => (mod_rating = 5)}>Exceptional</BrownButton>
 	</div>
-	<GrayButton onclick={submit} disabled={mod_rating === undefined}>Submit</GrayButton>
+
+	<GrayButton onclick={submit} disabled={mod_rating === undefined}>
+		Submit
+	</GrayButton>
 </div>

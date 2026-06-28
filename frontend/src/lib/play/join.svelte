@@ -170,28 +170,35 @@ SPDX-License-Identifier: MPL-2.0
 
 {#if game_pin === '' || game_pin.length < 6}
 	<!-- PIN-Eingabe -->
-	<div class="flex min-h-screen w-full items-center justify-center bg-[#0F172A] px-4">
+	<div class="flex min-h-screen w-full items-center justify-center bg-base px-4">
 		<div class="w-full max-w-sm">
 			<div class="mb-8 text-center">
-				<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6366F1]/20">
-					<svg class="h-8 w-8 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/20">
+					<svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 							d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
 					</svg>
 				</div>
-				<h1 class="text-2xl font-bold text-[#F8FAFC]">{$t('words.game_pin')}</h1>
-				<p class="mt-1 text-sm text-[#94A3B8]">Gib den 6-stelligen PIN ein</p>
+
+				<h1 class="text-2xl font-bold text-base">
+					{$t('words.game_pin')}
+				</h1>
+
+				<p class="mt-1 text-sm text-muted">
+					Gib den 6-stelligen PIN ein
+				</p>
 			</div>
 
-			<div class="rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
+			<div class="card p-6">
 				<input
-					class="w-full rounded-xl border border-white/10 bg-[#0F172A] px-4 py-3 text-center text-2xl font-bold tracking-[0.5em] text-[#F8FAFC] placeholder-[#475569] outline-none transition focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/30"
+					class="w-full rounded-xl border border-base bg-surface px-4 py-3 text-center text-2xl font-bold tracking-[0.5em] text-base placeholder:text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
 					bind:value={game_pin}
 					maxlength="6"
 					inputmode="numeric"
 					placeholder="······"
 				/>
-				<p class="mt-3 text-center text-xs text-[#475569]">
+
+				<p class="mt-3 text-center text-xs text-muted">
 					{game_pin.length}/6 Ziffern
 				</p>
 			</div>
@@ -199,38 +206,49 @@ SPDX-License-Identifier: MPL-2.0
 	</div>
 {:else}
 	<!-- Benutzername-Eingabe -->
-	<div class="flex min-h-screen w-full items-center justify-center bg-[#0F172A] px-4">
+	<div class="flex min-h-screen w-full items-center justify-center bg-base px-4">
 		<div class="w-full max-w-sm">
 			<div class="mb-8 text-center">
-				<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6366F1]/20">
-					<svg class="h-8 w-8 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/20">
+					<svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 					</svg>
 				</div>
-				<h1 class="text-2xl font-bold text-[#F8FAFC]">{$t('words.username')}</h1>
-				<p class="mt-1 text-sm text-[#94A3B8]">Wie soll dein Name im Spiel sein?</p>
+
+				<h1 class="text-2xl font-bold text-base">
+					{$t('words.username')}
+				</h1>
+
+				<p class="mt-1 text-sm text-muted">
+					Wie soll dein Name im Spiel sein?
+				</p>
 			</div>
 
-			<div class="rounded-2xl border border-white/10 bg-[#1E293B] p-6 shadow-xl">
+			<div class="card p-6">
 				<form onsubmit={setUsername} class="flex flex-col gap-4">
 					<div>
 						<input
-							class="w-full rounded-xl border border-white/10 bg-[#0F172A] px-4 py-3 text-center text-lg font-semibold text-[#F8FAFC] placeholder-[#475569] outline-none transition focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/30 disabled:opacity-50"
+							class="w-full rounded-xl border border-base bg-surface px-4 py-3 text-center text-lg font-semibold text-base placeholder:text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
 							bind:value={username}
 							maxlength="17"
 							placeholder="Dein Name…"
 						/>
-						<p class="mt-1 text-right text-xs text-[#475569]">{username?.length ?? 0}/17</p>
+
+						<p class="mt-1 text-right text-xs text-muted">
+							{username?.length ?? 0}/17
+						</p>
 					</div>
 
 					{#if custom_field}
 						<div>
-							<label for="custom-field-input" class="mb-1 block text-sm font-medium text-[#94A3B8]">{custom_field}</label>
+							<label class="mb-1 block text-sm font-medium text-muted">
+								{custom_field}
+							</label>
+
 							<input
-								class="w-full rounded-xl border border-white/10 bg-[#0F172A] px-4 py-3 text-[#F8FAFC] placeholder-[#475569] outline-none transition focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/30"
-								id="custom-field-input"
-				bind:value={custom_field_value}
+								class="w-full rounded-xl border border-base bg-surface px-4 py-3 text-base placeholder:text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+								bind:value={custom_field_value}
 								placeholder="Antwort eingeben…"
 							/>
 						</div>
@@ -239,16 +257,15 @@ SPDX-License-Identifier: MPL-2.0
 					<button
 						type="submit"
 						disabled={username?.length <= 3}
-						onclick={setUsername}
-						class="mt-2 w-full rounded-xl bg-[#6366F1] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#5558E3] disabled:cursor-not-allowed disabled:opacity-40"
+						class="mt-2 w-full rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{$t('words.submit')}
 					</button>
 				</form>
 			</div>
 
-			<p class="mt-4 text-center text-xs text-[#475569]">
-				PIN: <span class="font-mono font-bold text-[#6366F1]">{game_pin}</span>
+			<p class="mt-4 text-center text-xs text-muted">
+				PIN: <span class="font-mono font-bold text-primary">{game_pin}</span>
 			</p>
 		</div>
 	</div>

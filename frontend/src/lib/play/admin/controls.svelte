@@ -30,87 +30,101 @@ SPDX-License-Identifier: MPL-2.0
 	let is_slide = $derived(q[idx]?.type === QuizQuestionType.SLIDE);
 	let time_up = $derived(game_state.timer_res === '0');
 	let has_results = $derived(game_state.question_results !== null);
-	let final_not_shown = $derived(JSON.stringify(game_state.final_results) === JSON.stringify([null]));
+	let final_not_shown = $derived(
+		JSON.stringify(game_state.final_results) === JSON.stringify([null])
+	);
 </script>
 
 <div
-	class="fixed top-0 w-full z-20 flex items-center justify-between px-4 h-12 border-b border-white/10"
-	style="background-color: {bg_color ? bg_color : '#1E293B'}"
+	class="fixed top-0 z-20 flex h-12 w-full items-center justify-between border-b border-base px-4 bg-surface"
+	style="background-color: {bg_color || 'var(--surface)'}"
 >
 	<!-- Fortschritt -->
 	<div class="flex items-center gap-2">
-		<span class="text-sm font-bold text-[#F8FAFC]">
+		<span class="text-sm font-bold text-base">
 			{idx === -1 ? 0 : idx + 1}/{q.length}
 		</span>
-		<div class="hidden sm:flex gap-1">
+
+		<div class="hidden gap-1 sm:flex">
 			{#each q as _, i}
 				<div
 					class="h-1.5 w-6 rounded-full transition"
-					style="background-color: {i <= idx ? '#6366F1' : 'rgba(255,255,255,0.15)'}"
+					class:bg-primary={i <= idx}
+					class:bg-muted={i > idx}
 				></div>
 			{/each}
 		</div>
 	</div>
 
-	<!-- Aktions-Button -->
+	<!-- Actions -->
 	<div>
 		{#if is_last && ((time_up && has_results) || is_slide)}
 			{#if final_not_shown}
 				<button
 					onclick={() => socket_game_controls.get_final_results()}
-					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					class="btn btn-primary"
 				>
 					{$t('admin_page.get_final_results')}
 				</button>
 			{/if}
+
 		{:else if time_up || idx === -1}
 			{#if ((idx + 1 !== q.length && has_results) || idx === -1)}
 				<button
 					onclick={() => socket_game_controls.set_question_number(idx + 1)}
-					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					class="btn btn-primary"
 				>
 					{$t('admin_page.next_question', { question: idx + 2 })}
 				</button>
 			{/if}
+
 			{#if !has_results && idx !== -1}
 				{#if is_slide}
 					<button
 						onclick={() => socket_game_controls.set_question_number(idx + 1)}
-						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+						class="btn btn-primary"
 					>
 						{$t('admin_page.next_question', { question: idx + 2 })}
 					</button>
+
 				{:else if q[idx]?.hide_results === true}
 					<button
 						onclick={() => {
 							socket_game_controls.get_question_results(game_token, game_state.shown_question_now);
 							setTimeout(() => socket_game_controls.set_question_number(idx + 1), 200);
 						}}
-						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+						class="btn btn-primary"
 					>
 						{$t('admin_page.next_question', { question: idx + 2 })}
 					</button>
+
 				{:else}
 					<button
-						onclick={() => socket_game_controls.get_question_results(game_token, game_state.shown_question_now)}
-						class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+						onclick={() =>
+							socket_game_controls.get_question_results(
+								game_token,
+								game_state.shown_question_now
+							)}
+						class="btn btn-primary"
 					>
 						{$t('admin_page.show_results')}
 					</button>
 				{/if}
 			{/if}
+
 		{:else if idx !== -1}
 			{#if is_slide}
 				<button
 					onclick={() => socket_game_controls.set_question_number(idx + 1)}
-					class="rounded-xl bg-[#6366F1] px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-[#5558E3]"
+					class="btn btn-primary"
 				>
 					{$t('admin_page.next_question', { question: idx + 2 })}
 				</button>
+
 			{:else}
 				<button
 					onclick={show_solutions}
-					class="rounded-xl bg-red-500/80 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-red-500"
+					class="btn btn-danger"
 				>
 					{$t('admin_page.stop_time_and_solutions')}
 				</button>

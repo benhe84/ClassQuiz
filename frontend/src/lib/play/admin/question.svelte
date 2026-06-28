@@ -6,7 +6,6 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import { QuizQuestionType } from '$lib/quiz_types';
 	import type { QuizData } from '$lib/quiz_types';
-	import { get_foreground_color } from '$lib/helpers.js';
 	import CircularTimer from '$lib/play/circular_progress.svelte';
 	import { kahoot_icons } from '$lib/play/kahoot_mode_assets/kahoot_icons.js';
 	import MediaComponent from '$lib/editor/MediaComponent.svelte';
@@ -24,12 +23,17 @@ SPDX-License-Identifier: MPL-2.0
 
 	const { t } = getLocalization();
 
-	// Moderne Farben & Unicode-Symbole
-	default_colors = ['#6366F1', '#EC4899', '#F59E0B', '#10B981'];
+	// nur Tokens verwenden (keine Hex-Farben mehr)
+	default_colors = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)'];
 
 	let circular_progress = $derived.by(() => {
 		try {
-			return 1 - ((100 / parseInt(quiz_data.questions[selected_question].time)) * parseInt(timer_res)) / 100;
+			return (
+				1 -
+				(100 / parseInt(quiz_data.questions[selected_question].time)) *
+					parseInt(timer_res) /
+					100
+			);
 		} catch {
 			return 0;
 		}
@@ -39,22 +43,28 @@ SPDX-License-Identifier: MPL-2.0
 		answer.color ?? default_colors[i % 4];
 </script>
 
-<div class="flex flex-col w-full px-6 pt-4 pb-2">
+<div class="flex flex-col w-full px-6 pt-4 pb-2 bg-base text-base">
 	<!-- Frage -->
-	<h1 class="text-4xl font-bold text-center text-[#F8FAFC] leading-tight mb-4">
+	<h1 class="text-4xl font-bold text-center text-base leading-tight mb-4">
 		{@html quiz_data.questions[selected_question].question}
 	</h1>
 
 	<!-- Timer + Antwortcount -->
 	<div class="grid grid-cols-3 items-center mb-4">
 		<div></div>
+
 		<div class="flex justify-center">
-			<CircularTimer text={timer_res} progress={circular_progress} color="#6366F1" />
+			<CircularTimer text={timer_res} progress={circular_progress} color="var(--primary)" />
 		</div>
+
 		<div class="flex justify-end">
-			<div class="rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-center">
-				<p class="text-2xl font-bold text-[#F8FAFC]">{answer_count}</p>
-				<p class="text-xs text-[#475569]">{$t('admin_page.answers_submitted', { answer_count: '' }).replace(answer_count, '').trim()}</p>
+			<div class="rounded-xl border border-base bg-surface px-4 py-2 text-center">
+				<p class="text-2xl font-bold text-base">{answer_count}</p>
+				<p class="text-xs text-muted">
+					{$t('admin_page.answers_submitted', { answer_count: '' })
+						.replace(answer_count, '')
+						.trim()}
+				</p>
 			</div>
 		</div>
 	</div>
@@ -71,41 +81,58 @@ SPDX-License-Identifier: MPL-2.0
 	</div>
 {/if}
 
-<!-- Antworten ABCD / VOTING / CHECK -->
-{#if quiz_data.questions[selected_question].type === QuizQuestionType.ABCD || quiz_data.questions[selected_question].type === QuizQuestionType.VOTING || quiz_data.questions[selected_question].type === QuizQuestionType.CHECK}
+<!-- ABCD / VOTING / CHECK -->
+{#if quiz_data.questions[selected_question].type === QuizQuestionType.ABCD
+	|| quiz_data.questions[selected_question].type === QuizQuestionType.VOTING
+	|| quiz_data.questions[selected_question].type === QuizQuestionType.CHECK}
+
 	<div class="grid grid-cols-2 gap-3 w-full px-6 pb-6">
 		{#each quiz_data.questions[selected_question].answers as answer, i}
 			{@const color = get_color(answer, i)}
-			{@const fg = get_foreground_color(color)}
+			{@const fg = 'var(--text-primary)'}
+
 			<div
-				class="rounded-2xl flex items-center gap-3 px-4 py-4 shadow-lg border-2 border-black/10 transition"
-				style="background-color: {color}; color: {fg}; opacity: {!answer.right && timer_res === '0' && quiz_data.questions[selected_question].type === QuizQuestionType.ABCD ? '0.35' : '1'}"
+				class="rounded-2xl flex items-center gap-3 px-4 py-4 shadow-lg border border-base transition"
+				style="background-color: {color}; color: {fg};
+					opacity: {!answer.right
+						&& timer_res === '0'
+						&& quiz_data.questions[selected_question].type === QuizQuestionType.ABCD
+						? '0.35'
+						: '1'}"
 			>
 				<img class="w-10 inline-block pl-2" alt="icon" src={kahoot_icons[i]} />
-				<span class="text-xl font-semibold flex-1 text-center" style="color:{fg}">
+
+				<span class="text-xl font-semibold flex-1 text-center">
 					{answer.answer}
 				</span>
-				{#if answer.right && timer_res === '0' && quiz_data.questions[selected_question].type === QuizQuestionType.ABCD}
+
+				{#if answer.right
+					&& timer_res === '0'
+					&& quiz_data.questions[selected_question].type === QuizQuestionType.ABCD}
 					<span class="text-2xl shrink-0">✓</span>
 				{/if}
 			</div>
 		{/each}
 	</div>
 
-<!-- TEXT-Frage -->
+<!-- TEXT -->
 {:else if quiz_data.questions[selected_question].type === QuizQuestionType.TEXT}
 	{#if timer_res === '0'}
 		<div class="grid grid-cols-2 gap-3 w-full px-6 pb-6">
 			{#each quiz_data.questions[selected_question].answers as answer}
-				<div class="rounded-2xl flex items-center justify-center px-4 py-4 bg-[#6366F1] shadow-lg">
-					<span class="text-xl font-semibold text-white text-center">{answer.answer}</span>
+				<div class="rounded-2xl flex items-center justify-center px-4 py-4 bg-primary text-white shadow-lg">
+					<span class="text-xl font-semibold text-center">
+						{answer.answer}
+					</span>
 				</div>
 			{/each}
 		</div>
 	{:else}
 		<div class="flex justify-center pb-6">
-			<div class="rounded-2xl border border-white/10 bg-[#1E293B] px-6 py-4">
-				<p class="text-xl text-[#94A3B8]">{$t('admin_page.enter_answer_into_field')}</p>
+			<div class="rounded-2xl border border-base bg-surface px-6 py-4">
+				<p class="text-xl text-muted">
+					{$t('admin_page.enter_answer_into_field')}
+				</p>
 			</div>
 		</div>
 	{/if}

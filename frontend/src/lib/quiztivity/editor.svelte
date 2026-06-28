@@ -128,10 +128,7 @@ SPDX-License-Identifier: MPL-2.0
 		<div class="flex justify-center mt-6">
 			<div class="grid grid-cols-6 gap-6 w-11/12">
 				{#each data.pages as page, i (page.id)}
-					<div
-						class="border-[#EC4899] border-2 rounded-sm aspect-square flex flex-col group"
-						animate:flip={{ duration: 200 }}
-					>
+					<div class="border-2 border-base rounded-sm aspect-square flex flex-col group">
 						<p class="m-auto">{page.type}</p>
 						<div
 							class="grid grid-cols-2 gap-2 p-2 group-hover:opacity-100 transition-all"

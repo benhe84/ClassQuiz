@@ -15,7 +15,7 @@ SPDX-License-Identifier: MPL-2.0
 
 	let { data }: Props = $props();
 
-	const shuffle = <Type>(a: Array<Type>): Array<Type> => {
+	const shuffle = <Type,>(a: Array<Type>): Array<Type> => {
 		for (let i = a.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
 			[a[i], a[j]] = [a[j], a[i]];
@@ -86,13 +86,13 @@ SPDX-License-Identifier: MPL-2.0
 	<div class="grid lg:grid-cols-6 grid-cols-2 gap-2 m-4">
 		{#each random_card_order as card}
 			<button
-				class="aspect-square flex border-[#EC4899] border-2 rounded-sm"
+				class="aspect-square flex border-2 border-base rounded-sm bg-surface"
 				onclick={() => {
 					flip_card(card.id);
 				}}
 			>
 				{#if card_opened[card.id]}
-					<p class="m-auto transition-all">{card.text}</p>
+					<p class="m-auto transition-all text-base">{card.text}</p>
 				{:else}
 					<img
 						src="/android-chrome-512x512.png"
