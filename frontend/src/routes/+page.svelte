@@ -17,6 +17,7 @@ SPDX-License-Identifier: MPL-2.0
 	import ResultScreenshot from '$lib/assets/landing_new/result.webp';
 	import WinnersScreenshot from '$lib/assets/landing_new/winners.webp';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	const { t } = getLocalization();
 	navbarVisible.visible = true;
@@ -151,6 +152,240 @@ SPDX-License-Identifier: MPL-2.0
 			<a href="/explore" class="btn-outline px-6 py-3 text-base rounded-xl">
 				Quiz erkunden
 			</a>
+		</div>
+	</section>
+	<!-- Accordion -->
+	<section class="px-4 pb-24 lg:px-12">
+		<div class="mx-auto max-w-3xl flex flex-col gap-2">
+			<!-- 1. Ein Quiz holen -->
+			<div class="accordion-item">
+				<button
+					type="button"
+					onclick={() => (selected_section = selected_section === 0 ? -1 : 0)}
+					class="accordion-header"
+					aria-expanded={selected_section === 0}
+				>
+					<div class="flex items-center gap-3">
+						<span class="accordion-number">1</span>
+						<span class="font-semibold text-lg">{$t('index_page.get_a_quiz')}</span>
+					</div>
+
+					<svg
+						class="accordion-chevron"
+						class:accordion-chevron-open={selected_section === 0}
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+					</svg>
+				</button>
+
+				{#if selected_section === 0}
+					<div class="accordion-body" transition:fade={{ duration: 150 }}>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div class="feature-screenshot rounded-xl overflow-hidden">
+								{#if selected_create_thing === SelectedCreateThing.Create}
+									<img
+										class="feature-img"
+										src={EditScreenshot}
+										alt="Quiz erstellen"
+									/>
+								{:else if selected_create_thing === SelectedCreateThing.Find}
+									<img
+										class="feature-img"
+										src={FindScreenshot}
+										alt="Quiz finden"
+									/>
+								{:else}
+									<img
+										class="feature-img"
+										src={ImportScreenshot}
+										alt="Quiz importieren"
+									/>
+								{/if}
+							</div>
+
+							<div class="flex flex-col gap-3">
+								{#each create_options as opt}
+									<button
+										type="button"
+										onclick={() => (selected_create_thing = opt.key)}
+										class="feature-option"
+										class:feature-option-active={selected_create_thing ===
+											opt.key}
+									>
+										<div class="feature-option-icon">
+											<svg
+												class="h-5 w-5"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d={opt.icon}
+												/>
+											</svg>
+										</div>
+
+										<div>
+											<p class="font-semibold">{opt.label}</p>
+											<p
+												class="mt-0.5 text-sm"
+												style="color:var(--text-secondary);"
+											>
+												{opt.desc}
+											</p>
+										</div>
+									</button>
+								{/each}
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- 2. Das Quiz spielen -->
+			<div class="accordion-item">
+				<button
+					type="button"
+					onclick={() => (selected_section = selected_section === 1 ? -1 : 1)}
+					class="accordion-header"
+					aria-expanded={selected_section === 1}
+				>
+					<div class="flex items-center gap-3">
+						<span class="accordion-number">2</span>
+						<span class="font-semibold text-lg">{$t('index_page.play_quiz')}</span>
+					</div>
+
+					<svg
+						class="accordion-chevron"
+						class:accordion-chevron-open={selected_section === 1}
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+					</svg>
+				</button>
+
+				{#if selected_section === 1}
+					<div class="accordion-body" transition:fade={{ duration: 150 }}>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div class="feature-screenshot rounded-xl overflow-hidden">
+								{#if selected_play_thing === SelectedPlayThing.Select}
+									<img
+										class="feature-img"
+										src={SelectScreenshot}
+										alt="Antwort auswählen"
+									/>
+								{:else if selected_play_thing === SelectedPlayThing.Results}
+									<img
+										class="feature-img"
+										src={ResultScreenshot}
+										alt="Ergebnisse"
+									/>
+								{:else}
+									<img
+										class="feature-img"
+										src={WinnersScreenshot}
+										alt="Gewinner"
+									/>
+								{/if}
+							</div>
+
+							<div class="flex flex-col gap-3">
+								{#each play_options as opt}
+									<button
+										type="button"
+										onclick={() => (selected_play_thing = opt.key)}
+										class="feature-option"
+										class:feature-option-active={selected_play_thing ===
+											opt.key}
+									>
+										<p class="font-semibold">{opt.label}</p>
+										<p
+											class="mt-0.5 text-sm"
+											style="color:var(--text-secondary);"
+										>
+											{opt.desc}
+										</p>
+									</button>
+								{/each}
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- 3. Warum ClassQuiz -->
+			<div class="accordion-item">
+				<button
+					type="button"
+					onclick={() => (selected_section = selected_section === 2 ? -1 : 2)}
+					class="accordion-header"
+					aria-expanded={selected_section === 2}
+				>
+					<div class="flex items-center gap-3">
+						<span class="accordion-number">3</span>
+						<span class="font-semibold text-lg">{$t('index_page.why_classquiz')}</span>
+					</div>
+
+					<svg
+						class="accordion-chevron"
+						class:accordion-chevron-open={selected_section === 2}
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+					</svg>
+				</button>
+
+				{#if selected_section === 2}
+					<div class="accordion-body" transition:fade={{ duration: 150 }}>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div
+								class="flex items-start justify-center p-4 rounded-xl"
+								style="background-color:var(--bg);"
+							>
+								<p
+									class="text-base leading-relaxed"
+									style="color:var(--text-secondary);"
+								>
+									{classquiz_reasons[
+										selected_classquiz_reason === -1
+											? 0
+											: selected_classquiz_reason
+									].content}
+								</p>
+							</div>
+
+							<div class="flex flex-col gap-2 why-classquiz overflow-y-auto max-h-72">
+								{#each classquiz_reasons as reason, index}
+									<button
+										type="button"
+										onclick={() => (selected_classquiz_reason = index)}
+										class="feature-option"
+										class:feature-option-active={selected_classquiz_reason ===
+											index}
+									>
+										<p class="font-medium text-sm">
+											{reason.headline}
+										</p>
+									</button>
+								{/each}
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</section>
 
