@@ -19,7 +19,6 @@ SPDX-License-Identifier: MPL-2.0
 	--text:            	#0F172A;
 	--text-primary:		#0F172A;
 	--text-secondary:	#475569;
-	--text-input:		#0F172A;
 	--border:          #E2E8F0;
 	--success:         #16A34A;
 	--warning:         #D97706;
@@ -43,7 +42,6 @@ SPDX-License-Identifier: MPL-2.0
 	--danger:          #EF4444;
 	--text-primary:    #F8FAFC;
 	--text-secondary:  #CBD5E1;
-	--text-input:		#0F172A;
 	--border:          #334155;
 	--shadow:          rgba(0, 0, 0, 0.30);
 }
@@ -129,15 +127,15 @@ body {
 
 .input {
   background-color: var(--surface);
-  color: var(--text-input);
+  color: var(--text-primary);
   border: 1px solid var(--border);
   caret-color: var(--text-primary);
   border-radius: 0.5rem;
-  /*padding: 0.5rem 0.75rem;
-	font-size: 0.875rem;
-	outline: none;
-	transition: border-color 0.15s;
-	width: 100%;*/
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
 }
 
 /* wichtig für Platzhalter */
