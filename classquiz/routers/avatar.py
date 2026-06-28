@@ -7,7 +7,7 @@ import gzip
 
 from fastapi import APIRouter, Response, HTTPException, Depends
 import py_avataaars_no_png as av
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import Response
 from classquiz.config import redis
 
 from classquiz.auth import get_current_user
@@ -31,9 +31,8 @@ class AvatarItemsAsList:
     clothe_color = list(av.Color)
     clothe_graphic_type = list(av.ClotheGraphicType)
 
-
-@router.get("/custom", response_class=PlainTextResponse)
-async def get_customized_avatar(
+@router.get("/custom", response_class=Response)
+async def get_customized_avatar( 
     resp: Response,
     skin_color: int | None = 0,
     hair_color: int | None = 0,
