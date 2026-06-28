@@ -93,7 +93,8 @@
 				<h2 class="mb-4 text-lg font-bold text-base">Aktionen</h2>
 				<div class="w-full">
 					<div class="overflow-hidden rounded-xl border border-base">
-					{#if logged_in}
+					<!-- Spiel starten -->
+						{#if logged_in}
 					<button
 						onclick={() => (start_game = quiz.id)}
 						class="view-btn view-btn-primary"
@@ -115,18 +116,6 @@
 						</button>
 					</div>
 				{/if}
-					</div>
-				</div>
-			</section>
-			<section class="card"><h2 class="mb-4 text-lg font-bold text-base">Frage</h2> <div class="flex w-full flex-col gap-3"><!--[--><div class="overflow-hidden rounded-xl border border-base"><button type="button" class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"><span class="flex-1 font-medium text-base"><!---->Echt oder Fake?<!----></span> <!--[0--><span class="flex-shrink-0 text-sm text-secondary">Durchschnittliche Punktzahl: 722</span> <span class="flex-shrink-0 text-sm font-semibold text-success">1 richtige Antwort</span><!--]--> <svg class="h-4 w-4 flex-shrink-0 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></button> <!--[-1--><!--]--></div><div class="overflow-hidden rounded-xl border border-base"><button type="button" class="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-surface-2"><span class="flex-1 font-medium text-base"><!---->Echt oder Fake?<!----></span> <!--[0--><span class="flex-shrink-0 text-sm text-secondary">Durchschnittliche Punktzahl: 0</span> <span class="flex-shrink-0 text-sm font-semibold text-success">0 richtige Antwort</span><!--]--> <svg class="h-4 w-4 flex-shrink-0 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></button> <!--[-1--><!--]--></div><!--]--></div><!----></section></div>
-					
-
-
-
-			<div class="view-actions">
-				<!-- Spiel starten -->
-				
-
 				<!-- Üben -->
 				<a href="/practice?quiz_id={quiz.id}" class="view-btn view-btn-secondary">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -158,9 +147,9 @@
 						{$t('view_quiz_page.view_on_kahoot')}
 					</a>
 				{/if}
-			</div>
-
-			<div class="flex justify-center mt-4">
+					</div>
+				</div>
+							<div class="flex justify-center mt-4">
 				
 				<a	href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
 					class="text-xs underline"
@@ -169,10 +158,9 @@
 					{$t('words.report')}
 				</a>
 			</div>
-		</div>
-
-		<!-- Fragen -->
-		<div class="card">
+			</section>
+			<!-- Fragen -->
+			<section class="card">
 			<div class="flex items-center justify-between mb-5">
 				<h2 class="text-lg font-bold" style="color:var(--text-primary);">Fragen</h2>
 				<span class="questions-count">{quiz.questions.length}</span>
@@ -281,7 +269,7 @@
 						{/if}
 					</div>
 				{/each}
-			</div>
+			</div>		
 		</div>
 	</div>
 </div>
