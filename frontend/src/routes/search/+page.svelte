@@ -91,26 +91,27 @@ SPDX-License-Identifier: MPL-2.0
 					<SearchCard quiz={quiz._formatted} />
 				{/each}
 			</div>
-		{:else}<div class="card flex flex-col items-center justify-center py-16 gap-3 text-center">
-	<p class="text-sm" style="color:var(--text-secondary);">
-		{$t('search_page.nothing_here')}
-	</p>
-	<p class="text-sm" style="color:var(--text-secondary);">
-		{$t('search_page.not_found_intro')}
-		
-			<a class="text-primary underline-offset-2 hover:underline"
-			href="https://create.kahoot.it/search?query={search_term}&tags=test&filter=filter%3D1"
-			target="_blank"
-		>
-			Kahoot!
-		</a>
-		{$t('search_page.not_found_and')}
-		<a href="/import" class="text-primary underline-offset-2 hover:underline">
-			{$t('search_page.not_found_import')}
-		</a>
-		{$t('search_page.not_found_outro')}
-	</p>
-</div>
+		{:else}
+			<div class="card flex flex-col items-start justify-center py-16 gap-3 max-w-xl">
+				<p class="text-sm" style="color:var(--text-secondary);">
+					{$t('search_page.nothing_here')}
+				</p>
+				<p class="text-sm" style="color:var(--text-secondary);">
+					{$t('search_page.not_found_intro')}
+					
+						class="text-primary underline-offset-2 hover:underline"
+						href="https://create.kahoot.it/search?query={search_term}&tags=test&filter=filter%3D1"
+						target="_blank"
+					>
+						Kahoot!
+					</a>
+					{$t('search_page.not_found_and')}
+					<a href="/import" class="text-primary underline-offset-2 hover:underline">
+						{$t('search_page.not_found_import')}
+					</a>
+					{$t('search_page.not_found_outro')}
+				</p>
+			</div>
 		{/if}
 	{/if}
 </div>
