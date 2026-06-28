@@ -71,10 +71,16 @@ SPDX-License-Identifier: MPL-2.0
 			return this.timer_res === '0' && this.question_results !== null;
 		}
 		is_active_question_slide() {
-			return this.quiz_data?.questions?.[this.selected_question]?.type === QuizQuestionType.SLIDE;
+			return (
+				this.quiz_data?.questions?.[this.selected_question]?.type === QuizQuestionType.SLIDE
+			);
 		}
 		is_question_ended() {
-			return this.timer_res === '0' && this.question_results === null && this.selected_question !== -1;
+			return (
+				this.timer_res === '0' &&
+				this.question_results === null &&
+				this.selected_question !== -1
+			);
 		}
 		is_question_still_ongoing() {
 			return this.timer_res !== '0' && this.selected_question !== -1;
@@ -84,6 +90,10 @@ SPDX-License-Identifier: MPL-2.0
 	let { data }: Props = $props();
 	let game_mode = $state();
 	let { auto_connect, game_token } = $state(data);
+	let show_final_results = $derived(
+		game_state.game_started &&
+			game_state.selected_question === game_state.quiz_data?.questions?.length
+	);
 	const game_pin = data.game_pin;
 
 	let errorMessage = $state('');
@@ -173,16 +183,12 @@ SPDX-License-Identifier: MPL-2.0
 
 <svelte:window onbeforeunload={confirmUnload} />
 
-<div
-	class="min-h-screen min-w-full"
->
+<div class="min-h-screen min-w-full">
 	{#if show_final_results}
 		{#if game_state.control_visible}
 			<div class="fixed top-4 right-4 z-50 flex flex-col gap-2">
 				{#if export_token === undefined}
-					<button on:click={request_answer_export}>
-						Export anfordern
-					</button>
+					<button on:click={request_answer_export}> Export anfordern </button>
 				{:else}
 					<a
 						href="/api/v1/quiz/export_data/{export_token}?ts={Date.now()}&game_pin={game_pin}"
