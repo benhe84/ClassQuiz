@@ -1,17 +1,14 @@
 <!--
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
 SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
 	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import { getLocalization } from '$lib/i18n';
-	import Footer from '$lib/footer.svelte';
 	import WebPOpenGraph from '$lib/assets/landing/opengraph-home.webp';
 	import JpgOpenGraph from '$lib/assets/landing/opengraph-home.jpg';
-	import Newsletter from '$lib/landing/newsletter.svelte';
-	import { fly, fade } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 
 	import FindScreenshot from '$lib/assets/landing_new/find.webp';
 	import ImportScreenshot from '$lib/assets/landing_new/import.webp';
@@ -22,7 +19,6 @@ SPDX-License-Identifier: MPL-2.0
 	import { onMount } from 'svelte';
 
 	const { t } = getLocalization();
-
 	navbarVisible.visible = true;
 
 	let newsletterModalOpen: boolean = $state();
@@ -31,440 +27,309 @@ SPDX-License-Identifier: MPL-2.0
 		newsletterModalOpen = ls === null;
 	});
 
-	// eslint-disable-next-line no-unused-vars
-	enum SelectedCreateThing {
-		// eslint-disable-next-line no-unused-vars
-		Create,
-		// eslint-disable-next-line no-unused-vars
-		Find,
-		// eslint-disable-next-line no-unused-vars
-		Import
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	enum SelectedPlayThing {
-		// eslint-disable-next-line no-unused-vars
-		Select,
-		// eslint-disable-next-line no-unused-vars
-		Results,
-		// eslint-disable-next-line no-unused-vars
-		Winners
-	}
+	enum SelectedCreateThing { Create, Find, Import }
+	enum SelectedPlayThing { Select, Results, Winners }
 
 	let selected_create_thing = $state(SelectedCreateThing.Create);
 	let selected_play_thing = $state(SelectedPlayThing.Select);
 
 	const classquiz_reasons = [
-		{
-			headline: $t('index_page.no_player_limit'),
-			content: $t('index_page.no_player_limit_content')
-		},
-		{
-			headline: $t('index_page.no_tracking'),
-			content: $t('index_page.no_tracking_content')
-		},
-		{
-			headline: $t('index_page.self_hostable'),
-			content: $t('index_page.self_hostable_content')
-		},
-		{
-			headline: $t('index_page.german_server'),
-			content: $t('index_page.german_server_content')
-		},
-		{
-			headline: $t('index_page.user_friendly'),
-			content: $t('index_page.user_friendly_content')
-		},
-		{
-			headline: $t('index_page.completely_free'),
-			content: $t('index_page.completely_free_content')
-		},
-		{
-			headline: $t('index_page.quiz_results_downloadable'),
-			content: $t('index_page.quiz_results_downloadable_content')
-		},
-		{
-			headline: $t('index_page.multilingual'),
-			content: $t('index_page.multilingual_content')
-		},
-		{
-			headline: $t('index_page.dark_mode'),
-			content: $t('index_page.dark_mode_content')
-		},
-		{
-			headline: $t('index_page.download_quizzes'),
-			content: $t('index_page.download_quizzes_content')
-		},
-		{
-			headline: $t('index_page.community_driven'),
-			content: $t('index_page.community_driven_content')
-		}
+		{ headline: $t('index_page.no_player_limit'), content: $t('index_page.no_player_limit_content') },
+		{ headline: $t('index_page.no_tracking'), content: $t('index_page.no_tracking_content') },
+		{ headline: $t('index_page.self_hostable'), content: $t('index_page.self_hostable_content') },
+		{ headline: $t('index_page.german_server'), content: $t('index_page.german_server_content') },
+		{ headline: $t('index_page.user_friendly'), content: $t('index_page.user_friendly_content') },
+		{ headline: $t('index_page.completely_free'), content: $t('index_page.completely_free_content') },
+		{ headline: $t('index_page.quiz_results_downloadable'), content: $t('index_page.quiz_results_downloadable_content') },
+		{ headline: $t('index_page.multilingual'), content: $t('index_page.multilingual_content') },
+		{ headline: $t('index_page.dark_mode'), content: $t('index_page.dark_mode_content') },
+		{ headline: $t('index_page.download_quizzes'), content: $t('index_page.download_quizzes_content') },
+		{ headline: $t('index_page.community_driven'), content: $t('index_page.community_driven_content') }
 	];
 	let selected_classquiz_reason = $state(0);
+
+	const create_options = [
+		{
+			key: SelectedCreateThing.Create,
+			icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',
+			label: $t('words.create'),
+			desc: $t('index_page.create_a_quiz_from_scratch')
+		},
+		{
+			key: SelectedCreateThing.Find,
+			icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+			label: $t('words.find'),
+			desc: $t('index_page.find_or_explore')
+		}
+	];
+
+	const play_options = [
+		{
+			key: SelectedPlayThing.Select,
+			icon: 'M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122',
+			label: $t('index_page.select_answer'),
+			desc: $t('index_page.choose_answer_wisely')
+		},
+		{
+			key: SelectedPlayThing.Results,
+			icon: 'M4 6h16M4 10h16M4 14h16M4 18h16',
+			label: $t('index_page.view_results'),
+			desc: $t('index_page.check_if_chosen_wisely')
+		},
+		{
+			key: SelectedPlayThing.Winners,
+			icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+			label: $t('index_page.list_winners'),
+			desc: $t('index_page.get_ranking_and_winners')
+		}
+	];
 </script>
 
 <svelte:head>
 	<title>ClassQuiz - {$t('index_page.meta.title')}</title>
 	<meta name="description" content={$t('index_page.meta.description')} />
-	<title>ClassQuiz - Home</title>
-	<meta
-		name="description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
-
 	<meta property="og:url" content="https://classquiz.de/" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta
-		property="og:description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
+	<meta property="og:description" content="ClassQuiz is a quiz-application like KAHOOT!, but open-source." />
 	<meta property="og:image" content={JpgOpenGraph} />
-
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="twitter:domain" content="classquiz.de" />
 	<meta property="twitter:url" content="https://classquiz.de/" />
 	<meta name="twitter:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta
-		name="twitter:description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
+	<meta name="twitter:description" content="ClassQuiz is a quiz-application like KAHOOT!, but open-source." />
 	<meta name="twitter:image" content={WebPOpenGraph} />
 </svelte:head>
-<div class="min-h-screen flex flex-col">
-	<section class="pb-40">
-		<div class="pt-12 text-center">
-			<h1 class="sm:text-8xl text-6xl mt-6 marck-script">ClassQuiz</h1>
-			<p class="text-xl mt-4">{$t('index_page.slogan')}</p>
+
+<div class="min-h-screen">
+
+	<!-- Hero -->
+	<section class="flex flex-col items-center justify-center px-4 py-24 text-center">
+		<div class="hero-badge">
+			<span class="hero-badge-dot"></span>
+			Open Source · Kostenlos · Ohne Tracking
+		</div>
+		<h1 class="mt-6 text-6xl font-bold sm:text-8xl marck-script">ClassQuiz</h1>
+		<p class="mt-4 max-w-xl text-lg" style="color:var(--text-secondary);">{$t('index_page.slogan')}</p>
+		<div class="mt-8 flex gap-4">
+			<a href="/account/login" class="btn btn-primary px-6 py-3 text-base rounded-xl">
+				Jetzt starten
+			</a>
+			<a href="/explore" class="btn-outline px-6 py-3 text-base rounded-xl">
+				Quiz erkunden
+			</a>
 		</div>
 	</section>
-	<section>
-		<h2 class="text-center text-5xl mb-6">{$t('index_page.how_does_classquiz_work')}</h2>
 
-		<div class="flex justify-center w-full">
-			<h3 class="text-center text-3xl rounded-t-lg bg-white/40 py-2 px-6">
-				{$t('index_page.get_a_quiz')}
-			</h3>
+	<!-- Erstellen -->
+	<section class="px-4 pb-20 lg:px-12">
+		<div class="mb-6 text-center">
+			<h2 class="text-3xl font-bold">{$t('index_page.how_does_classquiz_work')}</h2>
+			<p class="mt-2 text-sm" style="color:var(--text-secondary);">{$t('index_page.get_a_quiz')}</p>
 		</div>
-		<div
-			class="grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 bg-white/40 shadow-lg mb-12 lg:mx-12 mx-4 rounded-lg"
-		>
-			<div>
-				<div class="p-2 rounded-lg">
+		<div class="feature-card mx-auto max-w-5xl">
+			<div class="grid grid-cols-1 lg:grid-cols-2">
+				<div class="feature-screenshot">
 					{#if selected_create_thing === SelectedCreateThing.Create}
-						<img
-							class="rounded-lg relative"
-							src={EditScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
+						<img class="feature-img" src={EditScreenshot} in:fade|global alt="Quiz erstellen" />
 					{:else if selected_create_thing === SelectedCreateThing.Find}
-						<img
-							class="rounded-lg relative"
-							src={FindScreenshot}
-							in:fade|global
-							alt="Screenshot of the search-page showing one found quiz for the term 'Country'"
-						/>
-					{:else if selected_create_thing === SelectedCreateThing.Import}
-						<img
-							class="rounded-lg relative"
-							src={ImportScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
+						<img class="feature-img" src={FindScreenshot} in:fade|global alt="Quiz finden" />
 					{:else}
-						<p>Shouldn't happen!</p>
+						<img class="feature-img" src={ImportScreenshot} in:fade|global alt="Quiz importieren" />
 					{/if}
 				</div>
-			</div>
-			<div
-				class="lg:border-l lg:border-l-black lg:border-t-0 border-t border-t-black flex lg:flex-col flex-row stretch"
-			>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_create_thing = SelectedCreateThing.Create;
-					}}
-					onkeyup={() => {
-						selected_create_thing = SelectedCreateThing.Create;
-					}}
-					class:shadow-2xl={selected_create_thing === SelectedCreateThing.Create}
-					class:opacity-70={selected_create_thing !== SelectedCreateThing.Create}
-					role="button"
-					tabindex="0"
-				>
-					<div
-						class="rounded-lg w-fit p-1 bg-lime-500 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="Pencil-Icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
+				<div class="feature-options">
+					{#each create_options as opt}
+						<button
+							type="button"
+							onclick={() => { selected_create_thing = opt.key; }}
+							class="feature-option"
+							class:feature-option-active={selected_create_thing === opt.key}
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl w-fit text-black">{$t('words.create')}</h5>
-					<p class="text-black">{$t('index_page.create_a_quiz_from_scratch')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_create_thing = SelectedCreateThing.Find;
-					}}
-					onkeyup={() => {
-						selected_create_thing = SelectedCreateThing.Find;
-					}}
-					role="button"
-					tabindex="0"
-					class:shadow-2xl={selected_create_thing === SelectedCreateThing.Find}
-					class:opacity-70={selected_create_thing !== SelectedCreateThing.Find}
-				>
-					<div
-						class="rounded-lg w-fit p-1 bg-lime-500 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-							aria-label="magnifying glass-Icon"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl text-black">{$t('words.find')}</h5>
-					<p class="text-black">{$t('index_page.find_or_explore')}</p>
+							<div class="feature-option-icon">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
+								</svg>
+							</div>
+							<div>
+								<p class="font-semibold">{opt.label}</p>
+								<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
+							</div>
+						</button>
+					{/each}
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<section class="mt-24">
-		<div class="flex justify-center w-full">
-			<h2 class="text-center text-3xl rounded-t-lg bg-white/40 py-2 px-6">
-				{$t('index_page.play_quiz')}
-			</h2>
+	<!-- Spielen -->
+	<section class="px-4 pb-20 lg:px-12">
+		<div class="mb-6 text-center">
+			<h2 class="text-3xl font-bold">{$t('index_page.play_quiz')}</h2>
 		</div>
-
-		<div
-			class="grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 bg-white/40 shadow-lg mb-12 lg:mx-12 mx-4 rounded-lg"
-		>
-			<div>
-				<div class="p-2 rounded-lg">
+		<div class="feature-card mx-auto max-w-5xl">
+			<div class="grid grid-cols-1 lg:grid-cols-2">
+				<div class="feature-screenshot">
 					{#if selected_play_thing === SelectedPlayThing.Select}
-						<img
-							class="rounded-lg relative"
-							src={SelectScreenshot}
-							in:fade|global
-							alt="Screenshot of the screen where an answer can be selected"
-						/>
+						<img class="feature-img" src={SelectScreenshot} in:fade|global alt="Antwort auswählen" />
 					{:else if selected_play_thing === SelectedPlayThing.Results}
-						<img
-							class="rounded-lg relative"
-							src={ResultScreenshot}
-							in:fade|global
-							alt="Screenshot of the results with a table showing how many players chose which answer"
-						/>
-					{:else if selected_play_thing === SelectedPlayThing.Winners}
-						<img
-							class="rounded-lg relative"
-							src={WinnersScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
+						<img class="feature-img" src={ResultScreenshot} in:fade|global alt="Ergebnisse" />
 					{:else}
-						<p>Shouldn't happen!</p>
+						<img class="feature-img" src={WinnersScreenshot} in:fade|global alt="Gewinner" />
 					{/if}
 				</div>
-			</div>
-			<div
-				class="lg:border-l lg:border-l-black lg:border-t-0 border-t border-t-black flex lg:flex-col flex-row stretch"
-			>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Select;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Select;
-					}}
-					role="button"
-					tabindex="0"
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Select}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Select}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="Mouse-Click icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
+				<div class="feature-options">
+					{#each play_options as opt}
+						<button
+							type="button"
+							onclick={() => { selected_play_thing = opt.key; }}
+							class="feature-option"
+							class:feature-option-active={selected_play_thing === opt.key}
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl w-fit text-black">{$t('index_page.select_answer')}</h5>
-					<p class="text-black">{$t('index_page.choose_answer_wisely')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					role="button"
-					tabindex="0"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Results;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Results;
-					}}
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Results}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Results}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="context-menu icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 6h16M4 10h16M4 14h16M4 18h16"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl text-black">{$t('index_page.view_results')}</h5>
-					<p class="text-black">{$t('index_page.check_if_chosen_wisely')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					role="button"
-					tabindex="0"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Winners;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Winners;
-					}}
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Winners}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Winners}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="sparkling stars-icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl text-black">{$t('index_page.list_winners')}</h5>
-					<p class="text-black">{$t('index_page.get_ranking_and_winners')}</p>
+							<div class="feature-option-icon">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" d={opt.icon} />
+								</svg>
+							</div>
+							<div>
+								<p class="font-semibold">{opt.label}</p>
+								<p class="mt-0.5 text-sm" style="color:var(--text-secondary);">{opt.desc}</p>
+							</div>
+						</button>
+					{/each}
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<section class="mt-24">
-		<div class="flex justify-center w-full">
-			<h2 class="text-center text-3xl rounded-t-lg bg-white/40 py-2 px-6">
-				{$t('index_page.why_classquiz')}
-			</h2>
+	<!-- Warum ClassQuiz -->
+	<section class="px-4 pb-24 lg:px-12">
+		<div class="mb-6 text-center">
+			<h2 class="text-3xl font-bold">{$t('index_page.why_classquiz')}</h2>
 		</div>
-
-		<div
-			class="grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 bg-white/40 shadow-lg mb-12 lg:mx-12 mx-4 rounded-lg"
-		>
-			<div>
-				<div class="p-12 rounded-lg flex justify-center items-center h-full">
-					<p class="text-black">
+		<div class="feature-card mx-auto max-w-5xl">
+			<div class="grid grid-cols-1 lg:grid-cols-2">
+				<div class="flex items-center justify-center p-10">
+					<p class="text-lg leading-relaxed" style="color:var(--text-secondary);">
 						{classquiz_reasons[selected_classquiz_reason].content}
 					</p>
 				</div>
-			</div>
-			<div
-				class="lg:border-l lg:border-l-black lg:border-t-0 border-t border-t-black flex lg:flex-col flex-row stretch overflow-x-auto why-classquiz"
-			>
-				{#each classquiz_reasons as reason, index}
-					<div
-						class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-						role="button"
-						tabindex="0"
-						onclick={() => {
-							selected_classquiz_reason = index;
-						}}
-						onkeyup={() => {
-							selected_classquiz_reason = index;
-						}}
-						class:shadow-2xl={selected_classquiz_reason === index}
-						class:opacity-70={selected_classquiz_reason !== index}
-					>
-						<h5 class="text-xl text-black">{reason.headline}</h5>
-					</div>
-				{/each}
+				<div class="feature-options why-classquiz max-h-96 overflow-y-auto lg:max-h-none border-t lg:border-t-0 lg:border-l" style="border-color:var(--border);">
+					{#each classquiz_reasons as reason, index}
+						<button
+							type="button"
+							onclick={() => { selected_classquiz_reason = index; }}
+							class="feature-option"
+							class:feature-option-active={selected_classquiz_reason === index}
+						>
+							<p class="font-medium">{reason.headline}</p>
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</section>
 </div>
 
 <style>
-	.why-classquiz::-webkit-scrollbar {
-		height: 0.8rem;
-		margin-bottom: 5rem;
+	.hero-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: 9999px;
+		border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+		background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+		padding: 0.375rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--primary);
 	}
-
-	.why-classquiz::-webkit-scrollbar-track {
-		box-shadow: inset 0 0 10px 10px transparent;
-		border: solid 3px transparent;
+	.hero-badge-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 9999px;
+		background-color: var(--primary);
+		animation: pulse 2s infinite;
 	}
-
+	.btn-outline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		border: 1px solid var(--border);
+		background-color: transparent;
+		color: var(--text-primary);
+		transition: all 0.15s;
+		cursor: pointer;
+	}
+	.btn-outline:hover {
+		background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
+	}
+	.feature-card {
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 1rem;
+		overflow: hidden;
+		box-shadow: 0 4px 24px var(--shadow);
+	}
+	.feature-screenshot {
+		padding: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--bg);
+	}
+	.feature-img {
+		border-radius: 0.75rem;
+		box-shadow: 0 4px 16px var(--shadow);
+		width: 100%;
+	}
+	.feature-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1.5rem;
+		border-left: 1px solid var(--border);
+	}
+	.feature-option {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		border-radius: 0.75rem;
+		padding: 1rem;
+		text-align: left;
+		transition: all 0.15s;
+		border: 1px solid transparent;
+		background-color: color-mix(in srgb, var(--text-primary) 3%, transparent);
+		color: var(--text-primary);
+		cursor: pointer;
+	}
+	.feature-option:hover {
+		background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+	}
+	.feature-option-active {
+		background-color: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+		border-color: color-mix(in srgb, var(--primary) 40%, transparent) !important;
+	}
+	.feature-option-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 0.5rem;
+		background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+		color: var(--primary);
+		flex-shrink: 0;
+		margin-top: 0.125rem;
+	}
+	.why-classquiz::-webkit-scrollbar { width: 0.4rem; }
+	.why-classquiz::-webkit-scrollbar-track { background: transparent; }
 	.why-classquiz::-webkit-scrollbar-thumb {
-		box-shadow: inset 0 0 10px 10px #374151;
-		border: solid 3px transparent;
-		border-radius: 15px;
+		background-color: var(--border);
+		border-radius: 9999px;
 	}
-
 	.why-classquiz::-webkit-scrollbar-thumb:hover {
-		box-shadow: inset 0 0 10px 10px #555;
-		border: solid 3px transparent;
+		background-color: var(--text-secondary);
 	}
 </style>

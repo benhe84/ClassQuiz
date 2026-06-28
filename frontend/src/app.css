@@ -195,3 +195,9 @@ body {
 		cursor: pointer;
 	}
 }
+
+.bg-surface { background-color: var(--surface); }
+.bg-base    { background-color: var(--bg); }
+.text-base  { color: var(--text-primary); }
+.text-muted { color: var(--text-secondary); }
+.border-base { border-color: var(--border); }
