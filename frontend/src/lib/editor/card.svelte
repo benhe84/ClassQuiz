@@ -2,7 +2,6 @@
 SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
-
 <script lang="ts">
 	import { run } from 'svelte/legacy';
 	import type { EditorData } from '$lib/quiz_types';
@@ -18,24 +17,14 @@ SPDX-License-Identifier: MPL-2.0
 	import BrownButton from '$lib/components/buttons/brown.svelte';
 
 	const { t } = getLocalization();
-
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'top'
-	});
+	const tippy = createTippy({ arrow: true, animation: 'perspective-subtle', placement: 'top' });
 
 	interface Props {
 		data: EditorData;
 		selected_question: number;
 		edit_id: string;
 	}
-
-	let {
-		data = $bindable(),
-		selected_question = $bindable(),
-		edit_id = $bindable()
-	}: Props = $props();
+	let { data = $bindable(), selected_question = $bindable(), edit_id = $bindable() }: Props = $props();
 
 	let advanced_options_open = $state(false);
 	let uppyOpen = $state(false);
@@ -43,26 +32,17 @@ SPDX-License-Identifier: MPL-2.0
 
 	const correctTimeInput = (_) => {
 		let time = data.questions[selected_question].time;
-		if (time === null || time === undefined) {
-			data.questions[selected_question].time = '';
-			time = '';
-		}
+		if (time === null || time === undefined) { data.questions[selected_question].time = ''; time = ''; }
 		if (data.questions[selected_question].time > 3) {
-			data.questions[selected_question].time = data.questions[selected_question].time
-				.toString()
-				.slice(0, 3);
+			data.questions[selected_question].time = data.questions[selected_question].time.toString().slice(0, 3);
 		}
 	};
-
 	const set_unique = () => { unique = {}; };
-
 	run(() => { correctTimeInput(data.questions[selected_question].time); });
 	run(() => { selected_question; set_unique(); });
 
 	let image_url = $state('');
-	const update_image_url = () => {
-		image_url = data.questions[selected_question].image;
-	};
+	const update_image_url = () => { image_url = data.questions[selected_question].image; };
 	run(() => { update_image_url(); selected_question; data.questions; });
 
 	const type_to_name = {
@@ -76,15 +56,15 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <div class="w-full max-h-full pb-10 px-10 h-full">
-	<div class="rounded-2xl w-full h-full shadow-2xl border border-white/10" style="background-color:#1E293B;">
+	<div class="editor-card">
 
 		<!-- Titelleiste -->
-		<div class="h-12 rounded-t-2xl flex items-center px-4 gap-3 border-b border-white/10" style="background-color:#0F172A;">
-			<span class="w-3 h-3 rounded-full bg-red-500/70 hover:bg-red-500 transition cursor-pointer"></span>
-			<span class="w-3 h-3 rounded-full bg-yellow-500/70 hover:bg-yellow-500 transition cursor-pointer"></span>
-			<span class="w-3 h-3 rounded-full bg-green-500/70 hover:bg-green-500 transition cursor-pointer"></span>
+		<div class="editor-card-bar">
+			<span class="dot dot-red"></span>
+			<span class="dot dot-yellow"></span>
+			<span class="dot dot-green"></span>
 			<button
-				class="ml-auto text-[#475569] hover:text-[#6366F1] transition"
+				class="ml-auto settings-btn"
 				type="button"
 				use:tippy={{ content: $t('editor.advanced_settings') }}
 				onclick={() => (advanced_options_open = true)}
@@ -106,16 +86,15 @@ SPDX-License-Identifier: MPL-2.0
 			{@const type = data.questions[selected_question].type}
 			<div class="flex flex-col">
 
-				<!-- Frage-Eingabe -->
+				<!-- Frage -->
 				<div class="flex justify-center pt-8 w-full px-6">
 					{#key unique}
 						{#await import('$lib/inline-editor.svelte')}
 							<Spinner my_20={false} />
 						{:then c}
 							<div
-								class="w-full rounded-xl border border-white/10 px-3 py-2"
-								style="background-color:#0F172A; color:#F8FAFC;"
-								class:border-yellow-500={!reach(dataSchema, 'questions[].question').isValidSync(data.questions[selected_question].question)}
+								class="editor-input-wrap w-full"
+								class:border-warning={!reach(dataSchema, 'questions[].question').isValidSync(data.questions[selected_question].question)}
 							>
 								<c.default bind:text={data.questions[selected_question].question} />
 							</div>
@@ -149,25 +128,24 @@ SPDX-License-Identifier: MPL-2.0
 
 				<!-- Zeit -->
 				<div class="flex justify-center pt-8 w-full">
-					<div class="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2" style="background-color:#0F172A;">
-						<svg class="w-5 h-5 text-[#6366F1]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<div class="time-input-wrap">
+						<svg class="w-5 h-5" style="color:var(--primary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
 						<input
 							type="number"
 							max="999"
 							min="1"
-							class="w-16 bg-transparent text-lg outline-none text-center font-bold"
-							style="color:#F8FAFC;"
+							class="time-input"
 							bind:value={data.questions[selected_question].time}
 						/>
-						<span style="color:#94A3B8;">s</span>
+						<span style="color:var(--text-secondary);">s</span>
 					</div>
 				</div>
 
-				<!-- Fragetyp -->
+				<!-- Fragetyp-Badge -->
 				<div class="flex justify-center py-4">
-					<span class="rounded-full px-3 py-1 text-xs font-semibold border border-white/10" style="color:#94A3B8; background-color:#0F172A;">
+					<span class="type-badge">
 						{type_to_name[String(data.questions[selected_question].type)]}
 					</span>
 				</div>
@@ -208,19 +186,12 @@ SPDX-License-Identifier: MPL-2.0
 </div>
 
 {#if advanced_options_open}
-	<div
-		class="fixed top-0 left-0 w-full h-full bg-black/60 flex"
-		transition:fade|global={{ duration: 150 }}
-	>
-		<div class="w-1/4 h-1/3 m-auto rounded-2xl border border-white/10 flex flex-col p-4 gap-4" style="background-color:#1E293B;">
-			<h1 class="text-xl font-bold text-center" style="color:#F8FAFC;">{$t('editor.advanced_settings')}</h1>
-			<label class="flex justify-between items-center gap-4 text-sm" style="color:#94A3B8;">
+	<div class="fixed inset-0 z-50 flex bg-black/60" transition:fade|global={{ duration: 150 }}>
+		<div class="m-auto w-80 rounded-2xl border p-6 flex flex-col gap-4" style="background-color:var(--surface); border-color:var(--border);">
+			<h1 class="text-xl font-bold text-center" style="color:var(--text-primary);">{$t('editor.advanced_settings')}</h1>
+			<label class="flex items-center justify-between gap-4 text-sm" style="color:var(--text-secondary);">
 				<span>{$t('editor.hide_question_results')}</span>
-				<input
-					type="checkbox"
-					bind:checked={data.questions[selected_question]['hide_results']}
-					class="w-4 h-4 accent-[#6366F1]"
-				/>
+				<input type="checkbox" bind:checked={data.questions[selected_question]['hide_results']} class="w-4 h-4 accent-[var(--primary)]" />
 			</label>
 			<div class="mt-auto w-full">
 				<BrownButton onclick={() => (advanced_options_open = false)}>{$t('words.close')}</BrownButton>
@@ -228,3 +199,79 @@ SPDX-License-Identifier: MPL-2.0
 		</div>
 	</div>
 {/if}
+
+<style>
+	.editor-card {
+		border-radius: 1rem;
+		border: 1px solid var(--border);
+		background-color: var(--surface);
+		width: 100%;
+		height: 100%;
+		box-shadow: 0 4px 24px var(--shadow);
+	}
+	.editor-card-bar {
+		height: 3rem;
+		border-radius: 1rem 1rem 0 0;
+		border-bottom: 1px solid var(--border);
+		background-color: var(--bg);
+		display: flex;
+		align-items: center;
+		padding: 0 1rem;
+		gap: 0.5rem;
+	}
+	.dot {
+		display: inline-block;
+		width: 0.75rem;
+		height: 0.75rem;
+		border-radius: 9999px;
+		opacity: 0.6;
+		transition: opacity 0.15s;
+	}
+	.dot:hover { opacity: 1; }
+	.dot-red { background-color: #EF4444; }
+	.dot-yellow { background-color: #F59E0B; }
+	.dot-green { background-color: #22C55E; }
+	.settings-btn {
+		color: var(--text-secondary);
+		transition: color 0.15s;
+	}
+	.settings-btn:hover { color: var(--primary); }
+	.editor-input-wrap {
+		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		background-color: var(--bg);
+		color: var(--text-primary);
+		padding: 0.5rem 0.75rem;
+	}
+	.border-warning {
+		border-color: var(--warning) !important;
+	}
+	.time-input-wrap {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		background-color: var(--bg);
+		padding: 0.5rem 1rem;
+	}
+	.time-input {
+		width: 4rem;
+		background: transparent;
+		border: none;
+		outline: none;
+		font-size: 1.125rem;
+		font-weight: 700;
+		text-align: center;
+		color: var(--text-primary);
+	}
+	.type-badge {
+		border-radius: 9999px;
+		border: 1px solid var(--border);
+		background-color: var(--bg);
+		color: var(--text-secondary);
+		padding: 0.25rem 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+</style>
