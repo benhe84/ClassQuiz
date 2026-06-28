@@ -258,21 +258,19 @@ async def delete_user_account(input_data: DeleteUserInput, user: User = Depends(
     await user.delete()
 
 
-@router.get("/avatar", response_class=PlainTextResponse)
-async def get_own_avatar(respo: Response, user: User = Depends(get_current_user)):
-    respo.headers.append("Content-Type", "image/svg+xml")
-    return gzip.decompress(base64.b64decode(user.avatar))
+@router.get("/avatar")
+async def get_own_avatar(user: User = Depends(get_current_user)):
+    avatar_svg = gzip.decompress(base64.b64decode(user.avatar))
+    return Response(content=avatar_svg, media_type="image/svg+xml")
 
 
-@router.get("/avatar/{user_id}", response_class=PlainTextResponse)
-async def get_other_avatar(respo: Response, user_id: uuid.UUID):
+@router.get("/avatar/{user_id}")
+async def get_other_avatar(user_id: uuid.UUID):
     user = await User.objects.filter(id=user_id).get_or_none()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    respo.headers.append("Content-Type", "image/svg+xml")
-    return gzip.decompress(base64.b64decode(user.avatar))
-
-
+    avatar_svg = gzip.decompress(base64.b64decode(user.avatar))
+    return Response(content=avatar_svg, media_type="image/svg+xml")
 class InternalAuthData(BaseModel):
     rememberme: str
     jwt: str | None = None
