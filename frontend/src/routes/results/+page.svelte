@@ -16,7 +16,7 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <div class="min-h-screen w-full bg-base px-4 py-12">
-	<div class="mx-auto w-full max-w-4xl">
+	<div class="mx-auto w-full max-w-xl">
 		<h1 class="mb-6 text-3xl font-bold text-base">{$t('results_page.title')}</h1>
 
 		{#if data.results.length === 0}
@@ -47,7 +47,7 @@ SPDX-License-Identifier: MPL-2.0
 							<tr class="border-b border-base transition hover:bg-surface-2">
 								<td class="p-4">
 									
-										href="/results/{result.id}"
+									<a	href="/results/{result.id}"
 										class="font-medium text-primary underline-offset-2 hover:underline"
 									>
 										{@html result.title}
